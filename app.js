@@ -10,7 +10,7 @@ const ENVELOPES=[
 const fresh=()=>({accounts:Object.fromEntries(ACCOUNTS.map(x=>[x.id,0])),envelopes:Object.fromEntries(ENVELOPES.map(x=>[x.id,0])),activity:[],view:'home'});
 let state=load();
 function load(){try{return {...fresh(),...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch{return fresh()}}
-function save(){localStorage.setItem(KEY,JSON.stringify(state))}
+function save(){localStorage.setItem(KEY,JSON.stringify(state));window.Cloud?.write(state)}
 const money=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(Number(n)||0);
 const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
@@ -70,5 +70,8 @@ function resetAll(){if(confirm('Erase every balance and activity record on this 
 function bind(){document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{state.view=b.dataset.view;save();render()});document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{state.view=b.dataset.go;save();render()});document.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>openModal(b.dataset.open));document.querySelector('#menuBtn').onclick=settings;
  const calc=document.querySelector('#calcAmount');if(calc){calc.oninput=()=>document.querySelector('#breakdown').innerHTML=breakdown(Number(calc.value));document.querySelector('#resetCalc').onclick=()=>{calc.value='';calc.dispatchEvent(new Event('input'));calc.focus()};document.querySelector('#copyCalc').onclick=()=>{const n=Number(calc.value);if(!n)return toast('Enter an amount first');const text=`2 Broke Girls split for ${money(n)}\nBusiness 50%: ${money(n*.5)}\nAmanda 15%: ${money(n*.15)}\nKatie 15%: ${money(n*.15)}\nHousehold 20%: ${money(n*.2)}`;navigator.clipboard?.writeText(text).then(()=>toast('Breakdown copied')).catch(()=>toast('Copy is not available'))}}
  const filters=['personFilter','envelopeFilter','typeFilter'].map(id=>document.querySelector('#'+id));if(filters[0])filters.forEach(x=>x.onchange=()=>{const [p,v,t]=filters.map(y=>y.value);const items=state.activity.filter(x=>(p==='all'||x.person===p)&&(v==='all'||x.envelope===v)&&(t==='all'||x.type===t));document.querySelector('#activityList').innerHTML=activityRows(items)})}
+window.getCloudState=()=>state;
+window.receiveCloudState=data=>{const currentView=state.view;state={...fresh(),...data,view:currentView};localStorage.setItem(KEY,JSON.stringify(state));render()};
 if('serviceWorker'in navigator&&location.protocol.startsWith('http'))window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js'));
 render();
+window.Cloud?.start();
