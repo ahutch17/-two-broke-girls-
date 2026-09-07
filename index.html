@@ -15,7 +15,7 @@
   <div class="backdrop" aria-hidden="true"></div>
   <header class="topbar">
     <div><p class="eyebrow">Amanda + Katie</p><h1>2 Broke Girls</h1></div>
-    <button class="icon-btn" id="menuBtn" aria-label="Open settings">•••</button>
+    <div class="top-actions"><span class="sync-badge" id="syncBadge" data-tone="warn">Sign in</span><button class="icon-btn" id="menuBtn" aria-label="Open settings">•••</button></div>
   </header>
   <main id="app"></main>
   <nav class="nav" aria-label="Main navigation">
@@ -25,7 +25,14 @@
     <button data-view="activity"><span>≡</span>Activity</button>
   </nav>
   <div id="modalRoot"></div>
+  <div id="cloudGate" class="cloud-gate" hidden>
+    <section class="gate-card"><p class="eyebrow">Shared budget</p><h2>Open 2 Broke Girls</h2><p data-gate-message>Sign in with an approved Google account to open the shared budget.</p><button class="btn primary" data-cloud-signin>Sign in with Google</button><small>Only Amanda and Katie’s approved accounts can access this data.</small></section>
+  </div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="firebase.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
