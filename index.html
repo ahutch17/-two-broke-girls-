@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#6f563d">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>2 Broke Girls</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="backdrop" aria-hidden="true"></div>
+  <header class="topbar">
+    <div><p class="eyebrow">Amanda + Katie</p><h1>2 Broke Girls</h1></div>
+    <button class="icon-btn" id="menuBtn" aria-label="Open settings">•••</button>
+  </header>
+  <main id="app"></main>
+  <nav class="nav" aria-label="Main navigation">
+    <button data-view="home" class="active"><span>⌂</span>Home</button>
+    <button data-view="money"><span>＋</span>Money</button>
+    <button data-view="calculator"><span>%</span>Split</button>
+    <button data-view="activity"><span>≡</span>Activity</button>
+  </nav>
+  <div id="modalRoot"></div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>
