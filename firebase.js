@@ -8,7 +8,7 @@
   function hideGate(){const g=gate();if(g)g.hidden=true}
   async function signIn(){try{const p=new firebase.auth.GoogleAuthProvider();p.setCustomParameters({prompt:'select_account'});await auth.signInWithPopup(p)}catch(e){const code=e?.code||'unknown';if(code==='auth/popup-blocked'){await auth.signInWithRedirect(new firebase.auth.GoogleAuthProvider());return}showGate(code==='auth/unauthorized-domain'?'This Vercel address still needs to be added to Firebase Authorized domains.':`Sign-in did not finish (${code}). Please try again.`);status('Sign-in needed','warn')}}
   async function start(){
-    if(started&&auth){status(ready?'Synced':'Connectingâ€¦',ready?'ok':'');return}started=true;
+    if(started&&auth){status(ready?'Synced':'Connecting...',ready?'ok':'');return}started=true;
     if(!window.firebase){showGate('Firebase could not load. Check the internet connection and refresh.');status('Firebase unavailable','warn');return}
     if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);
     auth=firebase.auth();db=firebase.firestore();ref=db.collection('budgets').doc('amanda-katie');
@@ -18,7 +18,7 @@
       if(!u){status('Sign in required','warn');showGate();return}
       const email=(u.email||'').toLowerCase();
       if(!ALLOWED.includes(email)){await auth.signOut();showGate(`${email} is not approved for this budget.`);status('Access denied','warn');return}
-      hideGate();status('Connectingâ€¦','');
+      hideGate();status('Connecting...','');
       try{
         const first=await ref.get();
         if(!first.exists)await ref.set({state:window.getCloudState(),updatedAt:firebase.firestore.FieldValue.serverTimestamp(),updatedBy:email});
@@ -26,6 +26,6 @@
       }catch(e){status('Sync paused','warn');showGate(`Signed in, but Firebase could not open the shared budget (${e?.code||'unknown'}).`)}
     });
   }
-  function write(next){if(!ready||!user)return;clearTimeout(saveTimer);status('Savingâ€¦','');saveTimer=setTimeout(()=>{const copy=JSON.parse(JSON.stringify(next));delete copy.view;ref.set({state:copy,updatedAt:firebase.firestore.FieldValue.serverTimestamp(),updatedBy:(user.email||'').toLowerCase()},{merge:true}).then(()=>status('Synced','ok')).catch(e=>status(`Sync paused (${e?.code||'error'})`,'warn'))},300)}
+  function write(next){if(!ready||!user)return;clearTimeout(saveTimer);status('Saving...','');saveTimer=setTimeout(()=>{const copy=JSON.parse(JSON.stringify(next));delete copy.view;ref.set({state:copy,updatedAt:firebase.firestore.FieldValue.serverTimestamp(),updatedBy:(user.email||'').toLowerCase()},{merge:true}).then(()=>status('Synced','ok')).catch(e=>status(`Sync paused (${e?.code||'error'})`,'warn'))},300)}
   window.Cloud={start,write,signIn,signOut:()=>auth&&auth.signOut(),isReady:()=>ready,user:()=>user};
 })();
