@@ -1,108 +1,1641 @@
-const KEY='twoBrokeGirlsV1';
-const PEOPLE={A:'Amanda',K:'Katie',Shared:'Shared',Gabby:'Gabby',Eli:'Eli',Abby:'Abby',Emma:'Emma'};
-const PALETTE=['#9f675f','#738268','#b78c52','#66879a','#9a7aa0','#b77e61','#7c8d87','#c29a8e','#89956c','#80654f','#a67582','#6f8798','#b49a63','#758e74','#9d7863','#7b718c','#ad846c'];
-const DEFAULT_ACCOUNTS=[
- {id:'a-cash',owner:'A',name:'Cash',color:'#9f675f',order:0},{id:'a-cashapp',owner:'A',name:'Cash App',color:'#b78c52',order:1},{id:'a-paypal',owner:'A',name:'PayPal',color:'#66879a',order:2},
- {id:'k-cashapp',owner:'K',name:'Cash App',color:'#738268',order:3},{id:'k-paypal',owner:'K',name:'PayPal',color:'#9a7aa0',order:4},{id:'k-cash',owner:'K',name:'Cash',color:'#b77e61',order:5}
+const KEY = "twoBrokeGirlsV1";
+const PEOPLE = {
+  A: "Amanda",
+  K: "Katie",
+  Shared: "Shared",
+  Gabby: "Gabby",
+  Eli: "Eli",
+  Abby: "Abby",
+  Emma: "Emma",
+};
+const PALETTE = [
+  "#9f675f",
+  "#738268",
+  "#b78c52",
+  "#66879a",
+  "#9a7aa0",
+  "#b77e61",
+  "#7c8d87",
+  "#c29a8e",
+  "#89956c",
+  "#80654f",
+  "#a67582",
+  "#6f8798",
+  "#b49a63",
+  "#758e74",
+  "#9d7863",
+  "#7b718c",
+  "#ad846c",
 ];
-const DEFAULT_ENVELOPES=[
- {id:'a-envelope',owner:'A',name:'A - Cash',color:'#9f675f',order:0},{id:'a-business',owner:'A',name:'Amanda - Business',color:'#b78c52',order:1},
- {id:'k-envelope',owner:'K',name:'K - Cash',color:'#738268',order:2},{id:'k-business',owner:'K',name:'Katie - Business',color:'#9a7aa0',order:3},
- {id:'household',owner:'Shared',name:'Household',color:'#66879a',order:4},{id:'unsorted',owner:'Shared',name:'Unsorted',color:'#80654f',order:5},
- ...['Gabby','Eli','Abby','Emma'].flatMap((child,ci)=>['Business','Cash','Unsorted'].map((name,ni)=>({id:`${child.toLowerCase()}-${name.toLowerCase()}`,owner:child,name:`${child} - ${name}`,color:PALETTE[6+ci*3+ni],order:6+ci*3+ni})))
+const DEFAULT_ACCOUNTS = [
+  { id: "a-cash", owner: "A", name: "Cash", color: "#9f675f", order: 0 },
+  { id: "a-cashapp", owner: "A", name: "Cash App", color: "#b78c52", order: 1 },
+  { id: "a-paypal", owner: "A", name: "PayPal", color: "#66879a", order: 2 },
+  { id: "k-cashapp", owner: "K", name: "Cash App", color: "#738268", order: 3 },
+  { id: "k-paypal", owner: "K", name: "PayPal", color: "#9a7aa0", order: 4 },
+  { id: "k-cash", owner: "K", name: "Cash", color: "#b77e61", order: 5 },
+  {
+    id: "gabby-account-cash",
+    owner: "Gabby",
+    name: "Cash",
+    color: "#7c8d87",
+    order: 6,
+  },
+  {
+    id: "eli-account-cash",
+    owner: "Eli",
+    name: "Cash",
+    color: "#c29a8e",
+    order: 7,
+  },
+  {
+    id: "abby-account-cash",
+    owner: "Abby",
+    name: "Cash",
+    color: "#89956c",
+    order: 8,
+  },
+  {
+    id: "emma-account-cash",
+    owner: "Emma",
+    name: "Cash",
+    color: "#80654f",
+    order: 9,
+  },
 ];
-const DEFAULT_PRESETS=[
- {id:'amanda-katie',name:'Amanda + Katie',parts:[{envelope:'a-business',percent:50},{envelope:'a-envelope',percent:15},{envelope:'k-envelope',percent:15},{envelope:'household',percent:20}]},
- {id:'older-kids',name:'Amanda + Katie + older kids',parts:[{envelope:'a-business',percent:40},{envelope:'a-envelope',percent:10},{envelope:'k-envelope',percent:10},{envelope:'household',percent:20},{envelope:'gabby-business',percent:10},{envelope:'eli-business',percent:10}]}
+const DEFAULT_ENVELOPES = [
+  {
+    id: "a-envelope",
+    owner: "A",
+    name: "A - Cash",
+    color: "#9f675f",
+    order: 0,
+  },
+  {
+    id: "a-business",
+    owner: "A",
+    name: "Amanda - Business",
+    color: "#b78c52",
+    order: 1,
+  },
+  {
+    id: "k-envelope",
+    owner: "K",
+    name: "K - Cash",
+    color: "#738268",
+    order: 2,
+  },
+  {
+    id: "k-business",
+    owner: "K",
+    name: "Katie - Business",
+    color: "#9a7aa0",
+    order: 3,
+  },
+  {
+    id: "household",
+    owner: "Shared",
+    name: "Household",
+    color: "#66879a",
+    order: 4,
+  },
+  {
+    id: "unsorted",
+    owner: "Shared",
+    name: "Unsorted",
+    color: "#80654f",
+    order: 5,
+  },
+  {
+    id: "freeze-dryer",
+    owner: "Shared",
+    name: "Freeze Dryer",
+    color: "#6f8798",
+    order: 18,
+  },
+  ...["Gabby", "Eli", "Abby", "Emma"].flatMap((child, ci) =>
+    ["Business", "Cash", "Unsorted"].map((name, ni) => ({
+      id: `${child.toLowerCase()}-${name.toLowerCase()}`,
+      owner: child,
+      name: `${child} - ${name}`,
+      color: PALETTE[6 + ci * 3 + ni],
+      order: 6 + ci * 3 + ni,
+    })),
+  ),
 ];
-const clone=x=>JSON.parse(JSON.stringify(x));
-const blank=()=>({accountDefs:clone(DEFAULT_ACCOUNTS),envelopeDefs:clone(DEFAULT_ENVELOPES),accounts:Object.fromEntries(DEFAULT_ACCOUNTS.map(x=>[x.id,0])),envelopes:Object.fromEntries(DEFAULT_ENVELOPES.map(x=>[x.id,0])),goals:{},activity:[],presets:clone(DEFAULT_PRESETS),view:'home',archivedEnvelopes:[],archivedAccounts:[],migrations:{}});
-function repairText(value){return typeof value==='string'?value.split('\u00e2\u20ac\u201d').join(' - ').split('\u00e2\u20ac\u201c').join(' - ').split('\u00c2\u00b7').join(' | ').split('\u00e2\u20ac\u00ba').join('>').split('\u00e2\u2020\u2019').join(' -> ').split('\u00e2\u2020\u201d').join(' <-> '):value}
-function normalize(raw={}){const base=blank(),s={...base,...raw};s.accountDefs=Array.isArray(raw.accountDefs)&&raw.accountDefs.length?raw.accountDefs:base.accountDefs;s.envelopeDefs=Array.isArray(raw.envelopeDefs)&&raw.envelopeDefs.length?raw.envelopeDefs:base.envelopeDefs;s.accounts=s.accounts||{};s.envelopes=s.envelopes||{};s.migrations=s.migrations||{};DEFAULT_ENVELOPES.forEach(d=>{if(!s.envelopeDefs.some(x=>x.id===d.id))s.envelopeDefs.push(clone(d))});DEFAULT_ACCOUNTS.forEach(d=>{if(!s.accountDefs.some(x=>x.id===d.id))s.accountDefs.push(clone(d))});if(!s.migrations.profileTabsV4){const oldBusiness=Number(s.envelopes.business||0);s.envelopes['a-business']=Number(s.envelopes['a-business']||0)+oldBusiness;s.envelopes['k-business']=Number(s.envelopes['k-business']||0);delete s.envelopes.business;s.envelopeDefs=s.envelopeDefs.filter(d=>d.id!=='business');(s.activity||[]).forEach(x=>{if(x.envelope==='business')x.envelope='a-business';if(Array.isArray(x.changes))x.changes.forEach(c=>{if(c.kind==='envelope'&&c.id==='business')c.id='a-business'})});(s.presets||[]).forEach(p=>(p.parts||[]).forEach(part=>{if(part.envelope==='business')part.envelope='a-business'}));s.migrations.profileTabsV4=true}s.accountDefs.forEach((d,i)=>{d.name=repairText(d.name);d.color=d.color||PALETTE[i%PALETTE.length];d.order=Number.isFinite(d.order)?d.order:i;if(!(d.id in s.accounts))s.accounts[d.id]=0});s.envelopeDefs.forEach((d,i)=>{d.name=repairText(d.name);d.color=d.color||PALETTE[i%PALETTE.length];d.order=Number.isFinite(d.order)?d.order:i;if(!(d.id in s.envelopes))s.envelopes[d.id]=0});s.goals=s.goals||{};s.activity=Array.isArray(s.activity)?s.activity:[];s.activity.forEach(x=>{x.title=repairText(x.title);x.note=repairText(x.note)});s.presets=Array.isArray(s.presets)&&s.presets.length?s.presets:clone(DEFAULT_PRESETS);s.archivedEnvelopes=s.archivedEnvelopes||[];s.archivedAccounts=s.archivedAccounts||[];return s}
-function load(){try{return normalize(JSON.parse(localStorage.getItem(KEY)||'{}'))}catch{return blank()}}
-let state=load(),lastUndo=null,cloudStatus={text:'Offline',tone:'warn'};
-const money=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(Number(n)||0);
-const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
-const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
-const total=o=>Object.values(o||{}).reduce((a,b)=>a+Number(b||0),0);
-const ownerName=o=>PEOPLE[o]||o||'Shared';
-const activeAccounts=()=>state.accountDefs.filter(x=>!state.archivedAccounts.includes(x.id)).sort((a,b)=>a.order-b.order);
-const activeEnvelopes=()=>state.envelopeDefs.filter(x=>!state.archivedEnvelopes.includes(x.id)).sort((a,b)=>a.order-b.order);
-const account=id=>state.accountDefs.find(x=>x.id===id)||{id,name:'Unknown account',owner:'Shared',color:'#80654f'};
-const envelope=id=>state.envelopeDefs.find(x=>x.id===id)||{id,name:'Unknown envelope',owner:'Shared',color:'#80654f'};
-function save(cloud=true){localStorage.setItem(KEY,JSON.stringify(state));if(cloud)window.Cloud?.write(state)}
-function toast(msg,undo=false){const t=document.querySelector('#toast');t.innerHTML=`<span>${esc(msg)}</span>${undo?'<button id="undoToast">Undo</button>':''}`;t.classList.add('show');if(undo)document.querySelector('#undoToast').onclick=undoLast;clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.classList.remove('show'),4200)}
-function addActivity(x,changes=[]){const item={id:uid(),date:new Date().toISOString(),changes,...x};state.activity.unshift(item);lastUndo=item.id;return item}
-function applyChanges(changes,mult=1){changes.forEach(c=>{const bucket=c.kind==='account'?state.accounts:state.envelopes;bucket[c.id]=Number(bucket[c.id]||0)+Number(c.delta||0)*mult})}
-function commitActivity(item){save();render();toast('Activity saved',Boolean(item?.changes?.length))}
-function undoLast(){const i=state.activity.findIndex(x=>x.id===lastUndo);if(i<0)return toast('Nothing to undo');const item=state.activity[i];applyChanges(item.changes,-1);state.activity.splice(i,1);lastUndo=null;save();render();toast('Last activity undone')}
-function render(){document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===state.view));const views={home:homeView,money:moneyView,calculator:calculatorView,activity:activityView};document.querySelector('#app').innerHTML=(views[state.view]||homeView)();bind()}
-function header(title,kicker=''){return `<div class="page-title">${kicker?`<p class="eyebrow">${esc(kicker)}</p>`:''}<h2>${esc(title)}</h2></div>`}
-let homeChartPerson='all',homeChartMode='account';
-const PROFILE_ORDER=['A','K','Gabby','Eli','Abby','Emma','Shared'];
-function ownedEnvelopes(owner){return activeEnvelopes().filter(x=>x.owner===owner)}
-function ownerAccounts(owner){return activeAccounts().filter(x=>x.owner===owner)}
-function profileEnvelopes(owner){if(owner==='A'||owner==='K')return activeEnvelopes().filter(x=>x.owner===owner||x.id==='unsorted');if(owner==='Shared')return activeEnvelopes().filter(x=>x.owner==='Shared'&&x.id!=='unsorted');return ownedEnvelopes(owner)}
-function profileTotal(owner){if(owner==='A'||owner==='K')return ownerAccounts(owner).reduce((sum,x)=>sum+Number(state.accounts[x.id]||0),0);return profileEnvelopes(owner).reduce((sum,x)=>sum+Number(state.envelopes[x.id]||0),0)}
-function chartEntries(mode,person){const list=mode==='account'?activeAccounts():activeEnvelopes(),bucket=mode==='account'?state.accounts:state.envelopes;let filtered=list;if(person!=='all'){if(mode==='envelope'&&(person==='A'||person==='K'))filtered=list.filter(x=>x.owner===person||x.id==='unsorted');else if(mode==='envelope'&&person==='Shared')filtered=list.filter(x=>x.owner==='Shared'&&x.id!=='unsorted');else filtered=list.filter(x=>x.owner===person)}return filtered.map(x=>({...x,value:Number(bucket[x.id]||0)}))}
-function homeChart(){let mode=homeChartMode;if(homeChartPerson!=='all'&&!['A','K'].includes(homeChartPerson)&&mode==='account'){mode='envelope';homeChartMode='envelope'}const entries=chartEntries(mode,homeChartPerson),positive=entries.filter(x=>x.value>0),negative=entries.filter(x=>x.value<0),positiveTotal=positive.reduce((sum,x)=>sum+x.value,0),displayTotal=entries.reduce((sum,x)=>sum+x.value,0);let cursor=0;const segments=positive.map(x=>({...x,pct:positiveTotal?x.value/positiveTotal*100:0})),gradient=segments.length?segments.map(x=>{const start=cursor;cursor+=x.pct;return `${x.color} ${start}% ${cursor}%`}).join(','):'#ded5c8 0 100%';return `<section class="panel home-chart"><div class="chart-controls"><label>Person<select id="chartPerson"><option value="all">Everyone</option>${PROFILE_ORDER.map(x=>`<option value="${x}" ${homeChartPerson===x?'selected':''}>${ownerName(x)}</option>`).join('')}</select></label><div class="breakdown-tabs"><button data-home-mode="account" class="${mode==='account'?'active':''}">By account</button><button data-home-mode="envelope" class="${mode==='envelope'?'active':''}">By envelope</button></div></div><div class="home-donut-layout"><div class="donut inline-donut" style="background:conic-gradient(${gradient})"><div><small>${homeChartPerson==='all'?'Available':ownerName(homeChartPerson)}</small><b>${money(displayTotal)}</b></div></div><div class="chart-key inline-key">${segments.map(x=>`<div><i style="background:${x.color}"></i><span><b>${esc(x.name)}</b><small>${ownerName(x.owner)}</small></span><strong>${money(x.value)}<small>${x.pct.toFixed(1)}%</small></strong></div>`).join('')||'<p>No positive balances in this view.</p>'}</div></div>${negative.length?`<div class="negative-list"><b>Negative balances</b>${negative.map(x=>`<div><span>${esc(x.name)}</span><strong>${money(x.value)}</strong></div>`).join('')}</div>`:''}</section>`}
-function accountBalanceCard(x){const bal=Number(state.accounts[x.id]||0);return `<div class="account-balance-card" style="--accent:${x.color}"><span class="color-dot"></span><span><b>${esc(x.name)}</b><small>${ownerName(x.owner)}</small></span><strong class="${bal<0?'negative':''}">${money(bal)}</strong></div>`}
-function profileCard(owner){const envs=profileEnvelopes(owner),accounts=ownerAccounts(owner),accent=envs[0]?.color||accounts[0]?.color||'#80654f',detail=accounts.length?`${accounts.length} accounts | ${envs.length} envelopes`:`${envs.length} envelope${envs.length===1?'':'s'}`;return `<button class="profile-card" data-profile="${owner}" style="--accent:${accent}"><span class="profile-mark">${ownerName(owner).slice(0,1)}</span><span><b>${ownerName(owner)}</b><small>${detail}</small></span><strong>${money(profileTotal(owner))}</strong><i>&rsaquo;</i></button>`}
-function homeView(){const aTotal=activeAccounts().filter(x=>x.owner==='A').reduce((sum,x)=>sum+Number(state.accounts[x.id]||0),0),kTotal=activeAccounts().filter(x=>x.owner==='K').reduce((sum,x)=>sum+Number(state.accounts[x.id]||0),0);return `${cloudStatus.tone==='warn'&&cloudStatus.text!=='Offline'?`<button class="sync-warning" data-settings>Warning: ${esc(cloudStatus.text)}</button>`:''}<section class="hero static-hero"><span class="hero-label">All money across every account</span><strong class="hero-value">${money(total(state.accounts))}</strong><span class="hero-sub">Amanda ${money(aTotal)} | Katie ${money(kTotal)}</span></section><div class="section-head"><div><p>Overview</p><h2>Money breakdown</h2></div><small>Filter by person</small></div>${homeChart()}<div class="section-head"><div><p>Profiles</p><h2>Money by person</h2></div><small>Tap for envelopes</small></div><section class="profile-grid">${PROFILE_ORDER.map(profileCard).join('')}</section>`}
-function openProfile(owner){const envs=profileEnvelopes(owner),accounts=ownerAccounts(owner),envIds=new Set(envs.map(x=>x.id)),related=state.activity.filter(x=>x.person===owner||(x.envelope&&envIds.has(x.envelope))).slice(0,8),totalLabel=accounts.length?'Physical account total':'Envelope total',root=modal(ownerName(owner),`<div class="profile-summary"><small>${totalLabel}</small><strong>${money(profileTotal(owner))}</strong></div>${accounts.length?`<h3 class="mini-title section-title">Physical accounts</h3><div class="account-balance-grid">${accounts.map(accountBalanceCard).join('')}</div>`:''}<h3 class="mini-title section-title">Envelopes</h3><div class="profile-envelope-grid">${envs.map(envelopeCard).join('')||'<div class="panel empty">No envelopes yet.</div>'}</div><h3 class="mini-title">Recent activity</h3><div class="activity-list">${activityRows(related)}</div>`,true);root.querySelectorAll('[data-envelope]').forEach(b=>b.onclick=()=>openEnvelope(b.dataset.envelope));root.querySelectorAll('[data-activity]').forEach(b=>b.onclick=()=>openActivityDetail(b.dataset.activity))}
-function envelopeCard(x){const bal=Number(state.envelopes[x.id]||0),goal=Number(state.goals[x.id]||0),pct=goal>0?Math.max(0,Math.min(100,bal/goal*100)):0;return `<button class="envelope-card" data-envelope="${x.id}" style="--accent:${x.color}"><span class="color-dot"></span><span class="envelope-name">${esc(x.name)}</span><span class="owner">${ownerName(x.owner)}</span><strong class="amount ${bal<0?'negative':''}">${money(bal)}</strong>${goal>0?`<span class="goal-mini"><span class="cup" style="--fill:${pct}%"><i></i></span><span>${money(bal)} of ${money(goal)}</span></span>`:''}</button>`}
-function moneyView(){return `${header('Update money','Money center')}<p class="page-sub">Add, move, and organize money in one place.</p><section class="menu-list">
- ${menuAction('income','+','Add money','Income or opening balance')}${menuAction('expense','-','Record spending','Reduce an account and envelope')}${menuAction('move','&harr;','Move money','Between accounts or envelopes')}${menuAction('adjust','Edit','Correct a balance','Create a labeled correction')}
- <div class="menu-divider"></div>${menuAction('manage-envelopes','Env','Manage envelopes','Add, rename, order, goals, and archive')}${menuAction('manage-accounts','Acct','Manage physical accounts','Add, rename, reconcile, and archive')}
- </section>`}
-function menuAction(id,icon,title,text){return `<button class="menu-row" data-open="${id}"><span class="menu-icon">${icon}</span><span><b>${title}</b><small>${text}</small></span><i>&rsaquo;</i></button>`}
-function calculatorView(){return `${header('Split calculator','Plan')}<p class="page-sub">Choose a saved split, then adjust it if needed.</p><section class="panel calc"><label class="label" for="calcAmount">Amount to divide</label><div class="money-input"><span>$</span><input id="calcAmount" inputmode="decimal" type="number" min="0" step="0.01" placeholder="100.00"></div><div class="preset-bar"><label class="label" for="presetSelect">Saved split</label><select id="presetSelect">${state.presets.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('')}<option value="custom">Custom</option></select></div><div id="splitEditor"></div><div class="calc-actions"><button class="btn subtle" id="addSplitRow">+ Add person</button><button class="btn subtle" id="savePreset">Save preset</button></div><div class="form-actions"><button class="btn" id="resetCalc">Reset</button><button class="btn primary" id="copyCalc">Copy breakdown</button></div></section>`}
-function activityView(){return `${header('Activity','Money record')}<div class="activity-tools"><button class="btn compact" data-summary>Monthly summary</button><button class="btn compact" data-filters>Filter <span id="filterCount"></span></button></div><div id="activeFilters" class="active-filters"></div><section id="activityList" class="activity-list">${activityRows(state.activity)}</section>`}
-function activityRows(items){if(!items.length)return `<div class="panel empty">No activity yet.</div>`;return items.map(x=>{const def=x.envelope?envelope(x.envelope):x.account?account(x.account):null,color=def?.color||'#80654f',icon=x.type==='income'?'+':x.type==='expense'?'-':x.type==='adjustment'?'Edit':'&harr;';return `<button class="activity-row" data-activity="${x.id}" style="--accent:${color}"><span class="activity-icon">${icon}</span><span class="activity-meta"><b>${esc(x.title)}</b><small>${new Date(x.date).toLocaleString()}${x.note?'  |  '+esc(x.note):''}</small></span><span class="activity-money"><b class="${Number(x.amount)<0?'negative':''}">${money(x.amount)}</b><small>${ownerName(x.person)}</small></span></button>`}).join('')}
-function options(list,kind,selected=''){return list.map(x=>`<option value="${x.id}" ${x.id===selected?'selected':''}>${kind==='account'?ownerName(x.owner)+'  -  '+x.name:x.name}</option>`).join('')}
-function modal(title,body,wide=false){const root=document.querySelector('#modalRoot');root.innerHTML=`<div class="modal-wrap" data-dismiss><section class="modal ${wide?'wide':''}" role="dialog" aria-modal="true"><div class="modal-head"><h2>${esc(title)}</h2><button class="close" data-close aria-label="Close">&times;</button></div>${body}</section></div>`;root.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>root.innerHTML='');root.querySelector('[data-dismiss]').onclick=e=>{if(e.target===e.currentTarget)root.innerHTML=''};return root}
-function field(name,label,control){return `<div class="field"><label>${label}</label>${control}</div>`}
-function amountField(label='Amount'){return field('amount',label,'<input name="amount" type="number" min="0.01" step="0.01" inputmode="decimal" required placeholder="0.00">')}
-function noteField(label){return field('note',label,`<input name="note" maxlength="160" placeholder="Optional">`)}
-function personOptions(){return Object.entries(PEOPLE).map(([v,l])=>`<option value="${v}">${l}</option>`).join('')}
-function openModal(type){if(['manage-envelopes','manage-accounts'].includes(type))return openManager(type==='manage-envelopes'?'envelope':'account');let body='',title='';
- if(type==='income'){title='Add money';body=`${field('person','Who received it?',`<select name="person">${personOptions()}</select>`)}${field('account','Physical account',`<select name="account">${options(activeAccounts(),'account')}</select>`)}${field('envelope','Envelope',`<select name="envelope">${options(activeEnvelopes(),'envelope','unsorted')}</select>`)}${amountField()}${noteField('Income source or note')}`}
- if(type==='expense'){title='Record spending';body=`${field('person','Who spent it?',`<select name="person">${personOptions()}</select>`)}${field('account','Paid from account',`<select name="account">${options(activeAccounts(),'account')}</select>`)}${field('envelope','Paid from envelope',`<select name="envelope">${options(activeEnvelopes(),'envelope')}</select>`)}${amountField()}${noteField('What was purchased?')}`}
- if(type==='move'){title='Move money';body=`${field('moveType','What should change?',`<select name="moveType" id="moveType"><option value="account-transfer">Physical accounts only</option><option value="envelope-transfer">Envelopes only</option><option value="combined-transfer">Accounts and envelopes together</option></select>`)}<div id="moveFields"></div>${amountField()}${noteField('Transfer note')}`}
- if(type==='adjust'){title='Correct a balance';body=`${field('targetType','Balance type',`<select name="targetType" id="targetType"><option value="account">Physical account</option><option value="envelope">Envelope</option></select>`)}<div id="targetField">${field('target','Account',`<select name="target">${options(activeAccounts(),'account')}</select>`)}</div>${field('direction','Correction',`<select name="direction"><option value="add">Add to balance</option><option value="subtract">Subtract from balance</option></select>`)}${amountField()}${noteField('Reason for correction')}`}
- const root=modal(title,`<form class="form" id="moneyForm" data-type="${type}">${body}<div class="form-actions"><button type="button" class="btn" data-close>Cancel</button><button class="btn primary">Save activity</button></div></form>`);root.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>root.innerHTML='');if(type==='move'){root.querySelector('#moveType').onchange=renderMoveFields;renderMoveFields()}if(type==='adjust')root.querySelector('#targetType').onchange=renderTargetField;root.querySelector('#moneyForm').onsubmit=submitMoney}
-function renderMoveFields(){const t=document.querySelector('#moveType').value;let h='';if(t!=='envelope-transfer')h+=field('fromAccount','From account',`<select name="fromAccount">${options(activeAccounts(),'account')}</select>`)+field('toAccount','To account',`<select name="toAccount">${options(activeAccounts(),'account')}</select>`);if(t!=='account-transfer')h+=field('fromEnvelope','From envelope',`<select name="fromEnvelope">${options(activeEnvelopes(),'envelope')}</select>`)+field('toEnvelope','To envelope',`<select name="toEnvelope">${options(activeEnvelopes(),'envelope')}</select>`);document.querySelector('#moveFields').innerHTML=h}
-function renderTargetField(){const t=document.querySelector('#targetType').value;document.querySelector('#targetField').innerHTML=field('target',t==='account'?'Account':'Envelope',`<select name="target">${options(t==='account'?activeAccounts():activeEnvelopes(),t)}</select>`)}
-function submitMoney(e){e.preventDefault();const f=new FormData(e.currentTarget),type=e.currentTarget.dataset.type,amount=Number(f.get('amount'));if(!(amount>0))return toast('Enter an amount greater than zero');const note=f.get('note')||'';let item;
- if(type==='income'||type==='expense'){const sign=type==='income'?1:-1,a=f.get('account'),v=f.get('envelope'),person=f.get('person'),changes=[{kind:'account',id:a,delta:sign*amount},{kind:'envelope',id:v,delta:sign*amount}];applyChanges(changes);item=addActivity({type,amount:sign*amount,person,account:a,envelope:v,title:type==='income'?`Added to ${account(a).name} + ${envelope(v).name}`:`Spent from ${account(a).name} + ${envelope(v).name}`,note},changes)}
- if(type==='move'){const mt=f.get('moveType'),changes=[];let person='Shared',envId=null,accId=null,title='Money moved';if(mt!=='envelope-transfer'){const from=f.get('fromAccount'),to=f.get('toAccount');if(from===to)return toast('Choose two different accounts');changes.push({kind:'account',id:from,delta:-amount},{kind:'account',id:to,delta:amount});person=account(to).owner;accId=to;title=`${account(from).name}  ->  ${account(to).name}`}if(mt!=='account-transfer'){const from=f.get('fromEnvelope'),to=f.get('toEnvelope');if(from===to)return toast('Choose two different envelopes');changes.push({kind:'envelope',id:from,delta:-amount},{kind:'envelope',id:to,delta:amount});envId=to;person=envelope(to).owner;title=mt==='envelope-transfer'?`${envelope(from).name}  ->  ${envelope(to).name}`:`${title}  |  ${envelope(from).name}  ->  ${envelope(to).name}`}applyChanges(changes);item=addActivity({type:mt,amount,person,account:accId,envelope:envId,title,note},changes)}
- if(type==='adjust'){const kind=f.get('targetType'),id=f.get('target'),sign=f.get('direction')==='add'?1:-1,owner=kind==='account'?account(id).owner:envelope(id).owner,changes=[{kind,id,delta:sign*amount}];applyChanges(changes);item=addActivity({type:'adjustment',amount:sign*amount,person:owner,account:kind==='account'?id:null,envelope:kind==='envelope'?id:null,title:`Corrected ${kind==='account'?account(id).name:envelope(id).name}`,note},changes)}
- document.querySelector('#modalRoot').innerHTML='';commitActivity(item)}
-function openManager(kind){const isEnv=kind==='envelope',defs=isEnv?activeEnvelopes():activeAccounts(),title=isEnv?'Manage envelopes':'Manage physical accounts';const rows=defs.map(d=>`<button class="manage-row" data-manage-id="${d.id}" style="--accent:${d.color}"><span class="color-dot"></span><span><b>${esc(d.name)}</b><small>${ownerName(d.owner)}  |  ${money((isEnv?state.envelopes:state.accounts)[d.id])}${isEnv&&state.goals[d.id]?`  |  Goal ${money(state.goals[d.id])}`:''}</small></span><i>&rsaquo;</i></button>`).join('');const root=modal(title,`<div class="manager-head"><button class="btn primary" id="addManaged">+ Add ${isEnv?'envelope':'account'}</button>${!isEnv?'<button class="btn" id="reconcileManaged">Reconcile</button>':''}</div><div class="manage-list">${rows}</div><button class="text-btn" id="showArchived">View archived</button>`);root.querySelector('#addManaged').onclick=()=>editManaged(kind);root.querySelector('#reconcileManaged')?.addEventListener('click',reconcileAccount);root.querySelectorAll('[data-manage-id]').forEach(b=>b.onclick=()=>editManaged(kind,b.dataset.manageId));root.querySelector('#showArchived').onclick=()=>showArchived(kind)}
-function editManaged(kind,id=null){const isEnv=kind==='envelope',def=id?(isEnv?envelope(id):account(id)):null;const body=`<form class="form" id="managedForm">${field('name',isEnv?'Envelope name':'Account name',`<input name="name" required maxlength="50" value="${esc(def?.name||'')}">`)}${field('owner','Owner',`<select name="owner">${Object.entries(PEOPLE).map(([v,l])=>`<option value="${v}" ${def?.owner===v?'selected':''}>${l}</option>`).join('')}</select>`)}${field('color','Color',`<input name="color" type="color" value="${def?.color||PALETTE[(isEnv?state.envelopeDefs.length:state.accountDefs.length)%PALETTE.length]}">`)}${isEnv?field('goal','Savings goal',`<input name="goal" type="number" min="0" step="0.01" value="${state.goals[id]||''}" placeholder="Optional">`):''}<div class="form-actions"><button type="button" class="btn" data-close>Cancel</button><button class="btn primary">Save</button></div>${id?'<button type="button" class="btn danger full" id="archiveManaged">Archive</button>':''}</form>`;const root=modal(`${id?'Edit':'Add'} ${isEnv?'envelope':'account'}`,body);root.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>root.innerHTML='');root.querySelector('#managedForm').onsubmit=e=>{e.preventDefault();const f=new FormData(e.currentTarget),defs=isEnv?state.envelopeDefs:state.accountDefs,balances=isEnv?state.envelopes:state.accounts;if(id){Object.assign(def,{name:f.get('name').trim(),owner:f.get('owner'),color:f.get('color')})}else{id=`${isEnv?'env':'acct'}-${uid()}`;defs.push({id,name:f.get('name').trim(),owner:f.get('owner'),color:f.get('color'),order:defs.length});balances[id]=0}if(isEnv){const goal=Number(f.get('goal')||0);if(goal>0)state.goals[id]=goal;else delete state.goals[id]}save();root.innerHTML='';render();toast(`${isEnv?'Envelope':'Account'} saved`)};root.querySelector('#archiveManaged')?.addEventListener('click',()=>{const bal=Number((isEnv?state.envelopes:state.accounts)[id]||0);if(bal!==0&&!confirm(`This ${kind} has ${money(bal)}. Archive it anyway?`))return;(isEnv?state.archivedEnvelopes:state.archivedAccounts).push(id);save();root.innerHTML='';render();toast(`${isEnv?'Envelope':'Account'} archived`)})}
-function showArchived(kind){const isEnv=kind==='envelope',ids=isEnv?state.archivedEnvelopes:state.archivedAccounts,defs=isEnv?state.envelopeDefs:state.accountDefs;modal(`Archived ${isEnv?'envelopes':'accounts'}`,ids.length?`<div class="manage-list">${ids.map(id=>{const d=defs.find(x=>x.id===id);return d?`<div class="manage-row"><span class="color-dot" style="--accent:${d.color}"></span><span><b>${esc(d.name)}</b><small>${money((isEnv?state.envelopes:state.accounts)[id])}</small></span><button class="text-btn" data-restore="${id}">Restore</button></div>`:''}).join('')}</div>`:'<div class="empty">Nothing archived.</div>');const root=document.querySelector('#modalRoot');root.querySelectorAll('[data-restore]').forEach(b=>b.onclick=()=>{const arr=isEnv?state.archivedEnvelopes:state.archivedAccounts;arr.splice(arr.indexOf(b.dataset.restore),1);save();openManager(kind);toast('Restored')})}
-function reconcileAccount(){const root=modal('Reconcile account',`<form class="form" id="reconcileForm">${field('account','Physical account',`<select name="account">${options(activeAccounts(),'account')}</select>`)}${field('actual','Actual balance','<input name="actual" type="number" step="0.01" required placeholder="0.00">')}${field('envelope','Apply the difference to',`<select name="envelope">${options(activeEnvelopes(),'envelope','unsorted')}</select>`)}${noteField('Reason or note')}<div class="form-actions"><button type="button" class="btn" data-close>Cancel</button><button class="btn primary">Reconcile</button></div></form>`);root.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>root.innerHTML='');root.querySelector('#reconcileForm').onsubmit=e=>{e.preventDefault();const f=new FormData(e.currentTarget),a=f.get('account'),v=f.get('envelope'),actual=Number(f.get('actual')),diff=actual-Number(state.accounts[a]||0);if(!Number.isFinite(actual))return;if(diff===0)return toast('That account already matches');const changes=[{kind:'account',id:a,delta:diff},{kind:'envelope',id:v,delta:diff}];applyChanges(changes);const item=addActivity({type:'adjustment',amount:diff,person:account(a).owner,account:a,envelope:v,title:`Reconciled ${account(a).name}`,note:f.get('note')||''},changes);root.innerHTML='';commitActivity(item)}}
-function openBreakdown(mode='account'){const list=mode==='account'?activeAccounts():activeEnvelopes(),bucket=mode==='account'?state.accounts:state.envelopes,positive=list.map(x=>({...x,value:Math.max(0,Number(bucket[x.id]||0))})).filter(x=>x.value>0),sum=positive.reduce((s,x)=>s+x.value,0),segments=positive.map((x,i)=>({...x,pct:sum?x.value/sum*100:0,color:x.color||PALETTE[i%PALETTE.length]}));let cursor=0;const grad=segments.length?segments.map(x=>{const start=cursor;cursor+=x.pct;return `${x.color} ${start}% ${cursor}%`}).join(','):'#ded5c8 0 100%';const negatives=list.filter(x=>Number(bucket[x.id]||0)<0);const root=modal('Money breakdown',`<div class="breakdown-tabs"><button data-mode="account" class="${mode==='account'?'active':''}">By account</button><button data-mode="envelope" class="${mode==='envelope'?'active':''}">By envelope</button></div><div class="donut-wrap"><div class="donut" style="background:conic-gradient(${grad})"><div><small>Available</small><b>${money(sum)}</b></div></div><div class="chart-key">${segments.map(x=>`<div><i style="background:${x.color}"></i><span><b>${esc(x.name)}</b><small>${ownerName(x.owner)}</small></span><strong>${money(x.value)}<small>${x.pct.toFixed(1)}%</small></strong></div>`).join('')||'<p>No positive balances yet.</p>'}</div></div>${negatives.length?`<div class="negative-list"><b>Negative balances</b>${negatives.map(x=>`<div><span>${esc(x.name)}</span><strong>${money(bucket[x.id])}</strong></div>`).join('')}</div>`:''}`,true);root.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>openBreakdown(b.dataset.mode))}
-function openEnvelope(id){const d=envelope(id),bal=Number(state.envelopes[id]||0),goal=Number(state.goals[id]||0),pct=goal>0?Math.max(0,Math.min(100,bal/goal*100)):0,related=state.activity.filter(x=>x.envelope===id).slice(0,8);modal(d.name,`<div class="envelope-detail" style="--accent:${d.color}"><div><span class="owner">${ownerName(d.owner)}</span><strong class="big-amount ${bal<0?'negative':''}">${money(bal)}</strong></div>${goal>0?`<div class="coffee-goal"><div class="coffee-cup"><div class="coffee-fill" style="height:${pct}%"></div><span>&#9749;</span></div><div><b>${Math.round(pct)}% full</b><small>${money(bal)} of ${money(goal)}</small></div></div>`:''}<button class="btn" data-edit-envelope>Edit envelope${goal?' or goal':''}</button></div><h3 class="mini-title">Recent activity</h3><div class="activity-list">${activityRows(related)}</div>`);const root=document.querySelector('#modalRoot');root.querySelector('[data-edit-envelope]').onclick=()=>editManaged('envelope',id);root.querySelectorAll('[data-activity]').forEach(b=>b.onclick=()=>openActivityDetail(b.dataset.activity))}
-function openActivityDetail(id){const x=state.activity.find(a=>a.id===id);if(!x)return;const rows=[['Amount',money(x.amount)],['Date',new Date(x.date).toLocaleString()],['Person',ownerName(x.person)],['Account',x.account?account(x.account).name:' - '],['Envelope',x.envelope?envelope(x.envelope).name:' - '],['Note',x.note||' - ']];const root=modal('Activity details',`<dl class="detail-list">${rows.map(([k,v])=>`<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>${x.changes?.length?'<button class="btn danger full" id="reverseActivity">Reverse this transaction</button>':'<p class="label">Older activity can be corrected from the Money section.</p>'}`);root.querySelector('#reverseActivity')?.addEventListener('click',()=>{if(!confirm('Reverse this transaction and restore the previous balances?'))return;applyChanges(x.changes,-1);state.activity=state.activity.filter(a=>a.id!==id);save();root.innerHTML='';render();toast('Transaction reversed')})}
-let filters={person:'all',envelope:'all',type:'all'};
-function openFilters(){const root=modal('Filter activity',`<form class="form" id="filterForm">${field('person','Person',`<select name="person"><option value="all">Everyone</option>${Object.entries(PEOPLE).map(([v,l])=>`<option value="${v}" ${filters.person===v?'selected':''}>${l}</option>`).join('')}</select>`)}${field('envelope','Envelope',`<select name="envelope"><option value="all">All envelopes</option>${activeEnvelopes().map(x=>`<option value="${x.id}" ${filters.envelope===x.id?'selected':''}>${x.name}</option>`).join('')}</select>`)}${field('type','Activity type',`<select name="type"><option value="all">All activity</option><option value="income">Money added</option><option value="expense">Spending</option><option value="account-transfer">Account moves</option><option value="envelope-transfer">Envelope moves</option><option value="combined-transfer">Combined moves</option><option value="adjustment">Corrections</option></select>`)}<div class="form-actions"><button type="button" class="btn" id="clearFilters">Clear</button><button class="btn primary">Apply</button></div></form>`);root.querySelector('[name="type"]').value=filters.type;root.querySelector('#clearFilters').onclick=()=>{filters={person:'all',envelope:'all',type:'all'};root.innerHTML='';render()};root.querySelector('#filterForm').onsubmit=e=>{e.preventDefault();const f=new FormData(e.currentTarget);filters={person:f.get('person'),envelope:f.get('envelope'),type:f.get('type')};root.innerHTML='';renderActivityFiltered()}}
-function renderActivityFiltered(){const items=state.activity.filter(x=>(filters.person==='all'||x.person===filters.person)&&(filters.envelope==='all'||x.envelope===filters.envelope)&&(filters.type==='all'||x.type===filters.type));document.querySelector('#activityList').innerHTML=activityRows(items);const count=Object.values(filters).filter(x=>x!=='all').length;const fc=document.querySelector('#filterCount');if(fc)fc.textContent=count?`(${count})`:'';const af=document.querySelector('#activeFilters');if(af)af.textContent=count?`${items.length} matching activities`:'';document.querySelectorAll('[data-activity]').forEach(b=>b.onclick=()=>openActivityDetail(b.dataset.activity))}
-function summaryBelongs(x,person){return person==='all'||x.person===person||(x.envelope&&envelope(x.envelope).owner===person)}
-function summaryCurrentTotal(person){return person==='all'?total(state.envelopes):profileTotal(person)}
-function monthlySummary(){const now=new Date(),monthKeys=[];for(let i=0;i<18;i++){const d=new Date(now.getFullYear(),now.getMonth()-i,1);monthKeys.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`)}state.activity.forEach(x=>{const d=new Date(x.date),key=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;if(!monthKeys.includes(key))monthKeys.push(key)});monthKeys.sort().reverse();const root=modal('Monthly summary',`<div class="summary-controls"><label>Person<select id="summaryPerson"><option value="all">Everyone</option>${PROFILE_ORDER.map(x=>`<option value="${x}">${ownerName(x)}</option>`).join('')}</select></label><label>Month<select id="summaryMonth">${monthKeys.map(key=>{const [y,m]=key.split('-').map(Number),label=new Date(y,m-1,1).toLocaleString(undefined,{month:'long',year:'numeric'});return `<option value="${key}">${label}</option>`}).join('')}</select></label></div><div id="summaryBody"></div>`);const draw=()=>{const person=root.querySelector('#summaryPerson').value,key=root.querySelector('#summaryMonth').value,[year,month]=key.split('-').map(Number),items=state.activity.filter(x=>{const d=new Date(x.date);return d.getFullYear()===year&&d.getMonth()===month-1&&summaryBelongs(x,person)}),income=items.filter(x=>x.type==='income').reduce((sum,x)=>sum+Math.max(0,Number(x.amount)),0),spent=Math.abs(items.filter(x=>x.type==='expense').reduce((sum,x)=>sum+Number(x.amount),0)),moved=items.filter(x=>String(x.type).includes('transfer')).reduce((sum,x)=>sum+Math.abs(Number(x.amount)),0);root.querySelector('#summaryBody').innerHTML=`<p class="summary-month">${person==='all'?'Everyone':ownerName(person)}</p><div class="summary-grid"><div><small>Money added</small><b>${money(income)}</b></div><div><small>Money spent</small><b>${money(spent)}</b></div><div><small>Money moved</small><b>${money(moved)}</b></div><div><small>Current envelope total</small><b>${money(summaryCurrentTotal(person))}</b></div></div>`};root.querySelector('#summaryPerson').onchange=draw;root.querySelector('#summaryMonth').onchange=draw;draw()}
-let splitParts=[];
-function loadPreset(id){const p=state.presets.find(x=>x.id===id);splitParts=clone(p?.parts||[{envelope:'a-business',percent:100}]);renderSplitEditor()}
-function renderSplitEditor(){const host=document.querySelector('#splitEditor');if(!host)return;const n=Number(document.querySelector('#calcAmount')?.value||0),sum=splitParts.reduce((s,x)=>s+Number(x.percent||0),0);host.innerHTML=`<div class="split-rows">${splitParts.map((p,i)=>`<div class="split-edit"><select data-split-env="${i}">${options(activeEnvelopes(),'envelope',p.envelope)}</select><label><input data-split-pct="${i}" type="number" min="0" max="100" step="1" value="${p.percent}"><span>%</span></label><strong>${money(n*p.percent/100)}</strong><button data-remove-split="${i}" aria-label="Remove">&times;</button></div>`).join('')}</div><div class="split-total ${Math.abs(sum-100)>.001?'bad':''}"><span>${sum===100?'Ready':'Remaining'} </span><b>${sum===100?'100%':`${100-sum}%`}</b><strong>${money(n)}</strong></div>`;host.querySelectorAll('[data-split-env]').forEach(s=>s.onchange=()=>{splitParts[Number(s.dataset.splitEnv)].envelope=s.value;renderSplitEditor()});host.querySelectorAll('[data-split-pct]').forEach(inp=>inp.oninput=()=>{splitParts[Number(inp.dataset.splitPct)].percent=Number(inp.value||0);renderSplitEditor()});host.querySelectorAll('[data-remove-split]').forEach(b=>b.onclick=()=>{splitParts.splice(Number(b.dataset.removeSplit),1);renderSplitEditor()})}
-function savePreset(){const sum=splitParts.reduce((s,x)=>s+x.percent,0);if(Math.abs(sum-100)>.001)return toast('Split must total 100%');const current=document.querySelector('#presetSelect').value,name=prompt('Preset name',current==='custom'?'My split':state.presets.find(x=>x.id===current)?.name||'My split');if(!name)return;const existing=state.presets.find(x=>x.id===current);if(existing){existing.name=name;existing.parts=clone(splitParts)}else state.presets.push({id:`preset-${uid()}`,name,parts:clone(splitParts)});save();render();toast('Preset saved')}
-function copySplit(){const n=Number(document.querySelector('#calcAmount').value),sum=splitParts.reduce((s,x)=>s+x.percent,0);if(!(n>0))return toast('Enter an amount first');if(Math.abs(sum-100)>.001)return toast('Split must total 100%');const text=`2 Broke Girls split for ${money(n)}\n`+splitParts.map(p=>`${envelope(p.envelope).name} ${p.percent}%: ${money(n*p.percent/100)}`).join('\n');navigator.clipboard?.writeText(text).then(()=>toast('Breakdown copied')).catch(()=>toast('Copy is not available'))}
-function settings(){const status=document.querySelector('#syncBadge')?.textContent||cloudStatus.text;const root=modal('Settings',`<div class="status-card"><span class="status-dot ${cloudStatus.tone}"></span><div><b>${esc(status)}</b><small>Cloud status</small></div><button class="text-btn" id="retrySync">Retry</button></div><div class="settings-list"><button id="manageUsers">Manage users <span>&rsaquo;</span></button><button id="exportBtn">Download backup <span>&rsaquo;</span></button><label>Restore backup <span>&rsaquo;</span><input type="file" id="importFile" accept="application/json" hidden></label><button id="archivedBtn">Archived envelopes <span>&rsaquo;</span></button><button id="appInfo">App information <span>&rsaquo;</span></button><button id="signOut">Sign out <span>&rsaquo;</span></button></div>`);root.querySelector('#retrySync').onclick=()=>window.Cloud?.start?.();root.querySelector('#manageUsers').onclick=()=>modal('Manage users','<p>Amanda and Katie use their approved Google accounts. New users must be added to both the app access list and Firebase security rules.</p><p class="label">Katie&rsquo;s access test is still pending.</p>');root.querySelector('#exportBtn').onclick=exportData;root.querySelector('#importFile').onchange=importData;root.querySelector('#archivedBtn').onclick=()=>showArchived('envelope');root.querySelector('#appInfo').onclick=()=>modal('App information','<p><b>2 Broke Girls</b></p><p>Version 4.1 | profile accounts</p>');root.querySelector('#signOut').onclick=()=>window.Cloud?.signOut?.()}
-function exportData(){const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`2-broke-girls-backup-${new Date().toISOString().slice(0,10)}.json`;a.click();URL.revokeObjectURL(a.href)}
-function importData(e){const file=e.target.files[0];if(!file)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!d.accounts||!d.envelopes||!Array.isArray(d.activity))throw 0;state=normalize(d);save();document.querySelector('#modalRoot').innerHTML='';render();toast('Backup restored')}catch{toast('That backup file is not valid')}};r.readAsText(file)}
-function bind(){document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{state.view=b.dataset.view;save(false);render()});document.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>openModal(b.dataset.open));document.querySelectorAll('[data-settings]').forEach(b=>b.onclick=settings);document.querySelector('#menuBtn').onclick=settings;document.querySelectorAll('[data-profile]').forEach(b=>b.onclick=()=>openProfile(b.dataset.profile));document.querySelector('#chartPerson')?.addEventListener('change',e=>{homeChartPerson=e.target.value;render()});document.querySelectorAll('[data-home-mode]').forEach(b=>b.onclick=()=>{homeChartMode=b.dataset.homeMode;render()});document.querySelectorAll('[data-envelope]').forEach(b=>b.onclick=()=>openEnvelope(b.dataset.envelope));document.querySelector('[data-summary]')?.addEventListener('click',monthlySummary);document.querySelector('[data-filters]')?.addEventListener('click',openFilters);document.querySelectorAll('[data-activity]').forEach(b=>b.onclick=()=>openActivityDetail(b.dataset.activity));const amount=document.querySelector('#calcAmount'),preset=document.querySelector('#presetSelect');if(amount&&preset){preset.onchange=()=>loadPreset(preset.value);amount.oninput=renderSplitEditor;document.querySelector('#addSplitRow').onclick=()=>{splitParts.push({envelope:activeEnvelopes()[0]?.id||'a-business',percent:0});renderSplitEditor()};document.querySelector('#savePreset').onclick=savePreset;document.querySelector('#resetCalc').onclick=()=>{amount.value='';loadPreset(preset.value)};document.querySelector('#copyCalc').onclick=copySplit;loadPreset(preset.value)}if(state.view==='activity')renderActivityFiltered()}
-window.getCloudState=()=>state;
-window.receiveCloudState=data=>{const currentView=state.view;state=normalize({...data,view:currentView});localStorage.setItem(KEY,JSON.stringify(state));render()};
-window.onCloudStatus=(text,tone)=>{cloudStatus={text,tone};const b=document.querySelector('#syncBadge');if(b){b.textContent=text;b.dataset.tone=tone||''}if(state.view==='home')render()};
-if('serviceWorker'in navigator&&location.protocol.startsWith('http'))window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js'));
+const DEFAULT_PRESETS = [
+  {
+    id: "amanda-katie",
+    name: "Amanda + Katie",
+    parts: [
+      { envelope: "a-business", percent: 50 },
+      { envelope: "a-envelope", percent: 15 },
+      { envelope: "k-envelope", percent: 15 },
+      { envelope: "household", percent: 20 },
+    ],
+  },
+  {
+    id: "older-kids",
+    name: "Amanda + Katie + older kids",
+    parts: [
+      { envelope: "a-business", percent: 40 },
+      { envelope: "a-envelope", percent: 10 },
+      { envelope: "k-envelope", percent: 10 },
+      { envelope: "household", percent: 20 },
+      { envelope: "gabby-business", percent: 10 },
+      { envelope: "eli-business", percent: 10 },
+    ],
+  },
+];
+const clone = (x) => JSON.parse(JSON.stringify(x));
+const blank = () => ({
+  accountDefs: clone(DEFAULT_ACCOUNTS),
+  envelopeDefs: clone(DEFAULT_ENVELOPES),
+  accounts: Object.fromEntries(DEFAULT_ACCOUNTS.map((x) => [x.id, 0])),
+  envelopes: Object.fromEntries(DEFAULT_ENVELOPES.map((x) => [x.id, 0])),
+  goals: {},
+  activity: [],
+  presets: clone(DEFAULT_PRESETS),
+  view: "home",
+  archivedEnvelopes: [],
+  archivedAccounts: [],
+  migrations: {},
+});
+function repairText(value) {
+  return typeof value === "string"
+    ? value
+        .split("\u00e2\u20ac\u201d")
+        .join(" - ")
+        .split("\u00e2\u20ac\u201c")
+        .join(" - ")
+        .split("\u00c2\u00b7")
+        .join(" | ")
+        .split("\u00e2\u20ac\u00ba")
+        .join(">")
+        .split("\u00e2\u2020\u2019")
+        .join(" -> ")
+        .split("\u00e2\u2020\u201d")
+        .join(" <-> ")
+    : value;
+}
+function normalize(raw = {}) {
+  const base = blank(),
+    safe = raw && typeof raw === "object" && !Array.isArray(raw) ? raw : {},
+    s = { ...base, ...safe };
+  s.accountDefs = (
+    Array.isArray(safe.accountDefs) && safe.accountDefs.length
+      ? safe.accountDefs
+      : base.accountDefs
+  ).filter((d) => d && typeof d === "object" && d.id);
+  s.envelopeDefs = (
+    Array.isArray(safe.envelopeDefs) && safe.envelopeDefs.length
+      ? safe.envelopeDefs
+      : base.envelopeDefs
+  ).filter((d) => d && typeof d === "object" && d.id);
+  s.accounts =
+    safe.accounts &&
+    typeof safe.accounts === "object" &&
+    !Array.isArray(safe.accounts)
+      ? safe.accounts
+      : {};
+  s.envelopes =
+    safe.envelopes &&
+    typeof safe.envelopes === "object" &&
+    !Array.isArray(safe.envelopes)
+      ? safe.envelopes
+      : {};
+  s.migrations =
+    safe.migrations && typeof safe.migrations === "object"
+      ? safe.migrations
+      : {};
+  DEFAULT_ENVELOPES.forEach((d) => {
+    if (!s.envelopeDefs.some((x) => x.id === d.id))
+      s.envelopeDefs.push(clone(d));
+  });
+  DEFAULT_ACCOUNTS.forEach((d) => {
+    if (!s.accountDefs.some((x) => x.id === d.id)) s.accountDefs.push(clone(d));
+  });
+  if (!s.migrations.profileTabsV4) {
+    const oldBusiness = Number(s.envelopes.business || 0);
+    s.envelopes["a-business"] =
+      Number(s.envelopes["a-business"] || 0) + oldBusiness;
+    s.envelopes["k-business"] = Number(s.envelopes["k-business"] || 0);
+    delete s.envelopes.business;
+    s.envelopeDefs = s.envelopeDefs.filter((d) => d.id !== "business");
+    (s.activity || []).forEach((x) => {
+      if (x && x.envelope === "business") x.envelope = "a-business";
+      if (Array.isArray(x?.changes))
+        x.changes.forEach((c) => {
+          if (c && c.kind === "envelope" && c.id === "business")
+            c.id = "a-business";
+        });
+    });
+    (s.presets || []).forEach((p) =>
+      (p?.parts || []).forEach((part) => {
+        if (part && part.envelope === "business") part.envelope = "a-business";
+      }),
+    );
+    s.migrations.profileTabsV4 = true;
+  }
+  s.accountDefs.forEach((d, i) => {
+    d.name = repairText(d.name || "Account");
+    d.color = d.color || PALETTE[i % PALETTE.length];
+    d.order = Number.isFinite(d.order) ? d.order : i;
+    if (!(d.id in s.accounts)) s.accounts[d.id] = 0;
+    s.accounts[d.id] = Number(s.accounts[d.id] || 0);
+  });
+  s.envelopeDefs.forEach((d, i) => {
+    d.name = repairText(d.name || "Envelope");
+    d.color = d.color || PALETTE[i % PALETTE.length];
+    d.order = Number.isFinite(d.order) ? d.order : i;
+    if (!(d.id in s.envelopes)) s.envelopes[d.id] = 0;
+    s.envelopes[d.id] = Number(s.envelopes[d.id] || 0);
+  });
+  s.goals = safe.goals && typeof safe.goals === "object" ? safe.goals : {};
+  s.activity = (Array.isArray(safe.activity) ? safe.activity : []).filter(
+    (x) => x && typeof x === "object",
+  );
+  s.activity.forEach((x) => {
+    x.title = repairText(x.title || "Activity");
+    x.note = repairText(x.note || "");
+    x.changes = Array.isArray(x.changes)
+      ? x.changes.filter(
+          (c) => c && ["account", "envelope"].includes(c.kind) && c.id,
+        )
+      : [];
+  });
+  s.presets = (
+    Array.isArray(safe.presets) && safe.presets.length
+      ? safe.presets
+      : clone(DEFAULT_PRESETS)
+  ).filter((p) => p && Array.isArray(p.parts));
+  s.archivedEnvelopes = Array.isArray(safe.archivedEnvelopes)
+    ? safe.archivedEnvelopes
+    : [];
+  s.archivedAccounts = Array.isArray(safe.archivedAccounts)
+    ? safe.archivedAccounts
+    : [];
+  if (!s.migrations.freshStartV51) {
+    s.accountDefs.forEach((d) => {
+      s.accounts[d.id] = 0;
+    });
+    Object.assign(s.accounts, {
+      "a-paypal": 238.2,
+      "a-cashapp": 9.31,
+      "a-cash": 162.0,
+      "k-cashapp": 25.75,
+      "k-paypal": 0,
+      "k-cash": 9.34,
+      "gabby-account-cash": 5.4,
+      "eli-account-cash": 20.59,
+      "abby-account-cash": 0,
+      "emma-account-cash": 14.0,
+    });
+    s.envelopeDefs.forEach((d) => {
+      s.envelopes[d.id] = 0;
+    });
+    Object.assign(s.envelopes, {
+      "a-envelope": 162.0,
+      "a-business": 91.0,
+      "k-envelope": 9.34,
+      "k-business": 0,
+      household: 0,
+      unsorted: 0,
+      "freeze-dryer": 4.0,
+      "gabby-business": 0,
+      "gabby-cash": 5.4,
+      "gabby-unsorted": 0,
+      "eli-business": 8.0,
+      "eli-cash": 20.59,
+      "eli-unsorted": 0,
+      "abby-business": 0,
+      "abby-cash": 0,
+      "abby-unsorted": 0,
+      "emma-business": 0,
+      "emma-cash": 14.0,
+      "emma-unsorted": 0,
+    });
+    s.activity = [];
+    s.migrations.freshStartV51 = true;
+    s.migrations.freshStartDate = "2026-10-06";
+  }
+  return s;
+}
+function load() {
+  try {
+    return normalize(JSON.parse(localStorage.getItem(KEY) || "{}"));
+  } catch {
+    return blank();
+  }
+}
+let state = load(),
+  lastUndo = null,
+  cloudStatus = { text: "Offline", tone: "warn" };
+const money = (n) =>
+  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(
+    Number(n) || 0,
+  );
+const esc = (s) =>
+  String(s ?? "").replace(
+    /[&<>'"]/g,
+    (c) =>
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[
+        c
+      ],
+  );
+const uid = () =>
+  Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+const total = (o) =>
+  Object.values(o || {}).reduce((a, b) => a + Number(b || 0), 0);
+const ownerName = (o) => (o === "Kids" ? "Kids" : PEOPLE[o] || o || "Shared");
+const activeAccounts = () =>
+  state.accountDefs
+    .filter((x) => !state.archivedAccounts.includes(x.id))
+    .sort((a, b) => a.order - b.order);
+const activeEnvelopes = () =>
+  state.envelopeDefs
+    .filter((x) => !state.archivedEnvelopes.includes(x.id))
+    .sort((a, b) => a.order - b.order);
+const account = (id) =>
+  state.accountDefs.find((x) => x.id === id) || {
+    id,
+    name: "Unknown account",
+    owner: "Shared",
+    color: "#80654f",
+  };
+const envelope = (id) =>
+  state.envelopeDefs.find((x) => x.id === id) || {
+    id,
+    name: "Unknown envelope",
+    owner: "Shared",
+    color: "#80654f",
+  };
+function save(cloud = true) {
+  localStorage.setItem(KEY, JSON.stringify(state));
+  if (cloud) window.Cloud?.write(state);
+}
+function toast(msg, undo = false) {
+  const t = document.querySelector("#toast");
+  t.innerHTML = `<span>${esc(msg)}</span>${undo ? '<button id="undoToast">Undo</button>' : ""}`;
+  t.classList.add("show");
+  if (undo) document.querySelector("#undoToast").onclick = undoLast;
+  clearTimeout(toast.timer);
+  toast.timer = setTimeout(() => t.classList.remove("show"), 4200);
+}
+function addActivity(x, changes = []) {
+  const item = {
+    id: uid(),
+    date: x.date || new Date().toISOString(),
+    changes,
+    ...x,
+  };
+  state.activity.unshift(item);
+  lastUndo = item.id;
+  return item;
+}
+function applyChanges(changes, mult = 1) {
+  changes.forEach((c) => {
+    const bucket = c.kind === "account" ? state.accounts : state.envelopes;
+    bucket[c.id] = Number(bucket[c.id] || 0) + Number(c.delta || 0) * mult;
+  });
+}
+function commitActivity(item) {
+  save();
+  render();
+  toast("Activity saved", Boolean(item?.changes?.length));
+}
+function undoLast() {
+  const i = state.activity.findIndex((x) => x.id === lastUndo);
+  if (i < 0) return toast("Nothing to undo");
+  const item = state.activity[i];
+  applyChanges(item.changes, -1);
+  state.activity.splice(i, 1);
+  lastUndo = null;
+  save();
+  render();
+  toast("Last activity undone");
+}
+function recoveryView(error) {
+  const app = document.querySelector("#app");
+  if (!app) return;
+  app.innerHTML = `<section class="panel recovery-panel"><p class="eyebrow">App recovery</p><h2>The budget could not finish loading</h2><p>Your shared Firebase data has not been deleted. Repair the local app files and reload the newest version.</p><p class="error-code">${esc(error?.message || "Unknown loading error")}</p><button class="btn primary" id="repairApp">Repair and reload</button></section>`;
+  document
+    .querySelector("#repairApp")
+    ?.addEventListener("click", repairLocalApp);
+}
+async function repairLocalApp() {
+  try {
+    localStorage.removeItem(KEY);
+    if ("caches" in window) {
+      const keys = await caches.keys();
+      await Promise.all(
+        keys
+          .filter((k) => k.startsWith("two-broke-girls"))
+          .map((k) => caches.delete(k)),
+      );
+    }
+    if ("serviceWorker" in navigator) {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map((r) => r.unregister()));
+    }
+  } finally {
+    location.reload();
+  }
+}
+function render() {
+  try {
+    document
+      .querySelectorAll(".nav button")
+      .forEach((b) =>
+        b.classList.toggle("active", b.dataset.view === state.view),
+      );
+    const views = {
+      home: homeView,
+      money: moneyView,
+      calculator: calculatorView,
+      activity: activityView,
+    };
+    document.querySelector("#app").innerHTML = (
+      views[state.view] || homeView
+    )();
+    bind();
+  } catch (error) {
+    console.error("Render failed", error);
+    recoveryView(error);
+  }
+}
+function header(title, kicker = "") {
+  return `<div class="page-title">${kicker ? `<p class="eyebrow">${esc(kicker)}</p>` : ""}<h2>${esc(title)}</h2></div>`;
+}
+let homeChartPerson = "all",
+  homeChartMode = "account";
+const CHILDREN = ["Gabby", "Eli", "Abby", "Emma"];
+const PROFILE_ORDER = ["A", "K", ...CHILDREN, "Shared"];
+const HOME_PROFILE_ORDER = ["A", "K", "Kids", "Shared"];
+function ownedEnvelopes(owner) {
+  return activeEnvelopes().filter((x) => x.owner === owner);
+}
+function ownerAccounts(owner) {
+  return activeAccounts().filter((x) => x.owner === owner);
+}
+function profileEnvelopes(owner) {
+  if (owner === "A" || owner === "K")
+    return activeEnvelopes().filter(
+      (x) => x.owner === owner || x.id === "unsorted",
+    );
+  if (owner === "Shared")
+    return activeEnvelopes().filter(
+      (x) => x.owner === "Shared" && x.id !== "unsorted",
+    );
+  return ownedEnvelopes(owner);
+}
+function profileTotal(owner) {
+  if (owner === "Kids")
+    return CHILDREN.reduce((sum, child) => sum + profileTotal(child), 0);
+  const accounts = ownerAccounts(owner);
+  if (accounts.length)
+    return accounts.reduce(
+      (sum, x) => sum + Number(state.accounts[x.id] || 0),
+      0,
+    );
+  return profileEnvelopes(owner).reduce(
+    (sum, x) => sum + Number(state.envelopes[x.id] || 0),
+    0,
+  );
+}
+function chartEntries(mode, person) {
+  const list = mode === "account" ? activeAccounts() : activeEnvelopes(),
+    bucket = mode === "account" ? state.accounts : state.envelopes;
+  let filtered = list;
+  if (person !== "all") {
+    if (mode === "envelope" && (person === "A" || person === "K"))
+      filtered = list.filter((x) => x.owner === person || x.id === "unsorted");
+    else if (mode === "envelope" && person === "Shared")
+      filtered = list.filter(
+        (x) => x.owner === "Shared" && x.id !== "unsorted",
+      );
+    else filtered = list.filter((x) => x.owner === person);
+  }
+  return filtered.map((x) => ({ ...x, value: Number(bucket[x.id] || 0) }));
+}
+function homeChart() {
+  let mode = homeChartMode;
+  if (homeChartPerson === "Shared" && mode === "account") {
+    mode = "envelope";
+    homeChartMode = "envelope";
+  }
+  const entries = chartEntries(mode, homeChartPerson),
+    positive = entries.filter((x) => x.value > 0),
+    negative = entries.filter((x) => x.value < 0),
+    positiveTotal = positive.reduce((sum, x) => sum + x.value, 0),
+    displayTotal = entries.reduce((sum, x) => sum + x.value, 0);
+  let cursor = 0;
+  const segments = positive.map((x) => ({
+      ...x,
+      pct: positiveTotal ? (x.value / positiveTotal) * 100 : 0,
+    })),
+    gradient = segments.length
+      ? segments
+          .map((x) => {
+            const start = cursor;
+            cursor += x.pct;
+            return `${x.color} ${start}% ${cursor}%`;
+          })
+          .join(",")
+      : "#ded5c8 0 100%";
+  return `<section class="panel home-chart"><div class="chart-controls"><label>Person<select id="chartPerson"><option value="all">Everyone</option>${PROFILE_ORDER.map((x) => `<option value="${x}" ${homeChartPerson === x ? "selected" : ""}>${ownerName(x)}</option>`).join("")}</select></label><div class="breakdown-tabs"><button data-home-mode="account" class="${mode === "account" ? "active" : ""}">By account</button><button data-home-mode="envelope" class="${mode === "envelope" ? "active" : ""}">By envelope</button></div></div><div class="home-donut-layout"><div class="donut inline-donut" style="background:conic-gradient(${gradient})"><div><small>${homeChartPerson === "all" ? "Available" : ownerName(homeChartPerson)}</small><b>${money(displayTotal)}</b></div></div><div class="chart-key inline-key">${segments.map((x) => `<div><i style="background:${x.color}"></i><span><b>${esc(x.name)}</b><small>${ownerName(x.owner)}</small></span><strong>${money(x.value)}<small>${x.pct.toFixed(1)}%</small></strong></div>`).join("") || "<p>No positive balances in this view.</p>"}</div></div>${negative.length ? `<div class="negative-list"><b>Negative balances</b>${negative.map((x) => `<div><span>${esc(x.name)}</span><strong>${money(x.value)}</strong></div>`).join("")}</div>` : ""}</section>`;
+}
+function accountBalanceCard(x) {
+  const bal = Number(state.accounts[x.id] || 0);
+  return `<div class="account-balance-card" style="--accent:${x.color}"><span class="color-dot"></span><span><b>${esc(x.name)}</b><small>${ownerName(x.owner)}</small></span><strong class="${bal < 0 ? "negative" : ""}">${money(bal)}</strong></div>`;
+}
+function profileCard(owner) {
+  if (owner === "Kids") {
+    const total = profileTotal("Kids");
+    return `<button class="profile-card kids-card" data-profile="Kids" style="--accent:#89956c"><span class="profile-mark">K</span><span><b>Kids</b><small>4 children | Cash accounts</small></span><strong>${money(total)}</strong><i>&rsaquo;</i></button>`;
+  }
+  const envs = profileEnvelopes(owner),
+    accounts = ownerAccounts(owner),
+    accent = accounts[0]?.color || envs[0]?.color || "#80654f",
+    detail = accounts.length
+      ? `${accounts.length} account${accounts.length === 1 ? "" : "s"} | ${envs.length} envelopes`
+      : `${envs.length} envelope${envs.length === 1 ? "" : "s"}`;
+  return `<button class="profile-card" data-profile="${owner}" style="--accent:${accent}"><span class="profile-mark">${ownerName(owner).slice(0, 1)}</span><span><b>${ownerName(owner)}</b><small>${detail}</small></span><strong>${money(profileTotal(owner))}</strong><i>&rsaquo;</i></button>`;
+}
+function homeView() {
+  const aTotal = profileTotal("A"),
+    kTotal = profileTotal("K"),
+    kidsTotal = profileTotal("Kids");
+  return `${cloudStatus.tone === "warn" && cloudStatus.text !== "Offline" ? `<button class="sync-warning" data-settings>Warning: ${esc(cloudStatus.text)}</button>` : ""}<section class="hero static-hero"><span class="hero-label">All money across every account</span><strong class="hero-value">${money(total(state.accounts))}</strong><span class="hero-sub">Amanda ${money(aTotal)} | Katie ${money(kTotal)} | Kids ${money(kidsTotal)}</span></section><div class="section-head"><div><p>Overview</p><h2>Money breakdown</h2></div><small>Filter by person</small></div>${homeChart()}<div class="section-head"><div><p>Profiles</p><h2>Money by person</h2></div><small>Tap for details</small></div><section class="profile-grid">${HOME_PROFILE_ORDER.map(profileCard).join("")}</section>`;
+}
+function openKids() {
+  const root = modal(
+    "Kids",
+    `<div class="kids-intro"><b>Children's money</b><p>Each child now has a separate Cash account. Existing balances were left unchanged so you can correct them manually.</p></div><section class="profile-grid kids-grid">${CHILDREN.map(profileCard).join("")}</section>`,
+    true,
+  );
+  root
+    .querySelectorAll("[data-profile]")
+    .forEach((b) => (b.onclick = () => openProfile(b.dataset.profile)));
+}
+function activityTouchesAccount(x, id) {
+  return (
+    x?.account === id ||
+    (Array.isArray(x?.changes) &&
+      x.changes.some((c) => c.kind === "account" && c.id === id))
+  );
+}
+function activityTouchesEnvelope(x, id) {
+  return (
+    x?.envelope === id ||
+    (Array.isArray(x?.changes) &&
+      x.changes.some((c) => c.kind === "envelope" && c.id === id))
+  );
+}
+function openProfile(owner) {
+  const envs = profileEnvelopes(owner),
+    accounts = ownerAccounts(owner),
+    envIds = new Set(envs.map((x) => x.id)),
+    related = state.activity
+      .filter(
+        (x) =>
+          x.person === owner ||
+          accounts.some((a) => activityTouchesAccount(x, a.id)) ||
+          envs.some((v) => activityTouchesEnvelope(x, v.id)),
+      )
+      .slice(0, 8),
+    totalLabel = accounts.length ? "Physical account total" : "Envelope total",
+    root = modal(
+      ownerName(owner),
+      `<div class="profile-summary"><small>${totalLabel}</small><strong>${money(profileTotal(owner))}</strong></div>${accounts.length ? `<h3 class="mini-title section-title">Physical accounts</h3><div class="account-balance-grid">${accounts.map(accountBalanceCard).join("")}</div>` : ""}<h3 class="mini-title section-title">Envelopes</h3><div class="profile-envelope-grid">${envs.map(envelopeCard).join("") || '<div class="panel empty">No envelopes yet.</div>'}</div><h3 class="mini-title">Recent activity</h3><div class="activity-list">${activityRows(related)}</div>`,
+      true,
+    );
+  root
+    .querySelectorAll("[data-envelope]")
+    .forEach((b) => (b.onclick = () => openEnvelope(b.dataset.envelope)));
+  root
+    .querySelectorAll("[data-activity]")
+    .forEach((b) => (b.onclick = () => openActivityDetail(b.dataset.activity)));
+}
+function envelopeCard(x) {
+  const bal = Number(state.envelopes[x.id] || 0),
+    goal = Number(state.goals[x.id] || 0),
+    pct = goal > 0 ? Math.max(0, Math.min(100, (bal / goal) * 100)) : 0;
+  return `<button class="envelope-card" data-envelope="${x.id}" style="--accent:${x.color}"><span class="color-dot"></span><span class="envelope-name">${esc(x.name)}</span><span class="owner">${ownerName(x.owner)}</span><strong class="amount ${bal < 0 ? "negative" : ""}">${money(bal)}</strong>${goal > 0 ? `<span class="goal-mini"><span class="cup" style="--fill:${pct}%"><i></i></span><span>${money(bal)} of ${money(goal)}</span></span>` : ""}</button>`;
+}
+function moneyView() {
+  return `${header("Update money", "Money center")}<p class="page-sub">Add, move, and organize money in one place.</p><section class="menu-list">
+ ${menuAction("income", "+", "Add money", "Income or opening balance")}${menuAction("expense", "-", "Record spending", "Reduce an account and envelope")}${menuAction("move", "&harr;", "Move money", "Between accounts or envelopes")}${menuAction("adjust", "Edit", "Correct a balance", "Create a labeled correction")}
+ <div class="menu-divider"></div>${menuAction("manage-envelopes", "Env", "Manage envelopes", "Add, rename, order, goals, and archive")}${menuAction("manage-accounts", "Acct", "Manage physical accounts", "Add, rename, reconcile, and archive")}
+ </section>`;
+}
+function menuAction(id, icon, title, text) {
+  return `<button class="menu-row" data-open="${id}"><span class="menu-icon">${icon}</span><span><b>${title}</b><small>${text}</small></span><i>&rsaquo;</i></button>`;
+}
+function calculatorView() {
+  return `${header("Split calculator", "Plan")}<p class="page-sub">Choose a saved split, then adjust it if needed.</p><section class="panel calc"><label class="label" for="calcAmount">Amount to divide</label><div class="money-input"><span>$</span><input id="calcAmount" inputmode="decimal" type="number" min="0" step="0.01" placeholder="100.00"></div><div class="preset-bar"><label class="label" for="presetSelect">Saved split</label><select id="presetSelect">${state.presets.map((p) => `<option value="${p.id}">${esc(p.name)}</option>`).join("")}<option value="custom">Custom</option></select></div><div id="splitEditor"></div><div class="calc-actions"><button class="btn subtle" id="addSplitRow">+ Add person</button><button class="btn subtle" id="savePreset">Save preset</button></div><div class="form-actions"><button class="btn" id="resetCalc">Reset</button><button class="btn primary" id="copyCalc">Copy breakdown</button></div></section>`;
+}
+function activityView() {
+  return `${header("Activity", "Money record")}<div class="activity-tools"><button class="btn compact" data-summary>Monthly summary</button><button class="btn compact" data-filters>Filter <span id="filterCount"></span></button></div><div id="activeFilters" class="active-filters"></div><div id="accountAudit"></div><section id="activityList" class="activity-list">${activityRows(state.activity)}</section>`;
+}
+function accountRunningBalances(accountId) {
+  const result = {};
+  let running = Number(state.accounts[accountId] || 0);
+  state.activity.forEach((x) => {
+    if (!activityTouchesAccount(x, accountId)) return;
+    result[x.id] = running;
+    const delta = (x.changes || [])
+      .filter((c) => c.kind === "account" && c.id === accountId)
+      .reduce((sum, c) => sum + Number(c.delta || 0), 0);
+    running -= delta;
+  });
+  return result;
+}
+function activityRows(items, runningBalances = null) {
+  if (!items.length)
+    return `<div class="panel empty">No activity matches these filters.</div>`;
+  return items
+    .map((x) => {
+      const def = x.envelope
+          ? envelope(x.envelope)
+          : x.account
+            ? account(x.account)
+            : null,
+        color = def?.color || "#80654f",
+        icon =
+          x.type === "income"
+            ? "+"
+            : x.type === "expense"
+              ? "-"
+              : x.type === "adjustment"
+                ? "Edit"
+                : "&harr;",
+        balance =
+          runningBalances &&
+          Object.prototype.hasOwnProperty.call(runningBalances, x.id)
+            ? `<small class="running-balance">Balance after: ${money(runningBalances[x.id])}</small>`
+            : "";
+      return `<button class="activity-row" data-activity="${x.id}" style="--accent:${color}"><span class="activity-icon">${icon}</span><span class="activity-meta"><b>${esc(x.title)}</b><small>${new Date(x.date).toLocaleString()}${x.note ? "  |  " + esc(x.note) : ""}</small>${balance}</span><span class="activity-money"><b class="${Number(x.amount) < 0 ? "negative" : ""}">${money(x.amount)}</b><small>${ownerName(x.person)}</small></span></button>`;
+    })
+    .join("");
+}
+function options(list, kind, selected = "") {
+  return list
+    .map(
+      (x) =>
+        `<option value="${x.id}" ${x.id === selected ? "selected" : ""}>${kind === "account" ? ownerName(x.owner) + "  -  " + x.name : x.name}</option>`,
+    )
+    .join("");
+}
+function modal(title, body, wide = false) {
+  const root = document.querySelector("#modalRoot");
+  root.innerHTML = `<div class="modal-wrap" data-dismiss><section class="modal ${wide ? "wide" : ""}" role="dialog" aria-modal="true"><div class="modal-head"><h2>${esc(title)}</h2><button class="close" data-close aria-label="Close">&times;</button></div>${body}</section></div>`;
+  root
+    .querySelectorAll("[data-close]")
+    .forEach((b) => (b.onclick = () => (root.innerHTML = "")));
+  root.querySelector("[data-dismiss]").onclick = (e) => {
+    if (e.target === e.currentTarget) root.innerHTML = "";
+  };
+  return root;
+}
+function field(name, label, control) {
+  return `<div class="field"><label>${label}</label>${control}</div>`;
+}
+function amountField(label = "Amount") {
+  return field(
+    "amount",
+    label,
+    '<input name="amount" type="number" min="0.01" step="0.01" inputmode="decimal" required placeholder="0.00">',
+  );
+}
+function noteField(label) {
+  return field(
+    "note",
+    label,
+    `<input name="note" maxlength="160" placeholder="Optional">`,
+  );
+}
+function todayValue() {
+  const d = new Date(),
+    offset = d.getTimezoneOffset();
+  return new Date(d.getTime() - offset * 60000).toISOString().slice(0, 10);
+}
+function dateField() {
+  return field(
+    "date",
+    "Transaction date",
+    `<input name="date" type="date" value="${todayValue()}" required>`,
+  );
+}
+function transactionIso(value) {
+  const d = new Date(`${value || todayValue()}T12:00:00`);
+  return Number.isNaN(d.getTime()) ? new Date().toISOString() : d.toISOString();
+}
+function personOptions() {
+  return Object.entries(PEOPLE)
+    .map(([v, l]) => `<option value="${v}">${l}</option>`)
+    .join("");
+}
+function transactionAccounts(person) {
+  return person === "Shared"
+    ? activeAccounts().filter((x) => ["A", "K"].includes(x.owner))
+    : ownerAccounts(person);
+}
+function transactionEnvelopes(person) {
+  return profileEnvelopes(person);
+}
+function syncPersonMoneyFields(type) {
+  const form = document.querySelector("#moneyForm");
+  if (!form) return;
+  const person = form.querySelector('[name="person"]')?.value || "A",
+    accounts = transactionAccounts(person),
+    envs = transactionEnvelopes(person),
+    accountSelect = form.querySelector('[name="account"]'),
+    envelopeSelect = form.querySelector('[name="envelope"]');
+  if (accountSelect) accountSelect.innerHTML = options(accounts, "account");
+  if (envelopeSelect) {
+    const preferred =
+      type === "income" && envs.some((x) => x.id === "unsorted")
+        ? "unsorted"
+        : envs[0]?.id || "";
+    envelopeSelect.innerHTML = options(envs, "envelope", preferred);
+  }
+}
+function openModal(type) {
+  if (["manage-envelopes", "manage-accounts"].includes(type))
+    return openManager(type === "manage-envelopes" ? "envelope" : "account");
+  let body = "",
+    title = "";
+  if (type === "income") {
+    title = "Add money";
+    body = `${field("person", "Who received it?", `<select name="person">${personOptions()}</select>`)}${field("account", "Physical account", `<select name="account"></select>`)}${field("envelope", "Envelope", `<select name="envelope"></select>`)}${amountField()}${dateField()}${noteField("Income source or note")}`;
+  }
+  if (type === "expense") {
+    title = "Record spending";
+    body = `${field("person", "Who spent it?", `<select name="person">${personOptions()}</select>`)}${field("account", "Paid from account", `<select name="account"></select>`)}${field("envelope", "Paid from envelope", `<select name="envelope"></select>`)}${amountField()}${dateField()}${noteField("What was purchased?")}`;
+  }
+  if (type === "move") {
+    title = "Move money";
+    body = `${field("moveType", "What should change?", `<select name="moveType" id="moveType"><option value="account-transfer">Physical accounts only</option><option value="envelope-transfer">Envelopes only</option><option value="combined-transfer">Accounts and envelopes together</option></select>`)}<div id="moveFields"></div>${amountField()}${dateField()}${noteField("Transfer note")}`;
+  }
+  if (type === "adjust") {
+    title = "Correct a balance";
+    body = `${field("targetType", "Balance type", `<select name="targetType" id="targetType"><option value="account">Physical account</option><option value="envelope">Envelope</option></select>`)}<div id="targetField">${field("target", "Account", `<select name="target">${options(activeAccounts(), "account")}</select>`)}</div>${field("direction", "Correction", `<select name="direction"><option value="add">Add to balance</option><option value="subtract">Subtract from balance</option></select>`)}${amountField()}${dateField()}${noteField("Reason for correction")}`;
+  }
+  const root = modal(
+    title,
+    `<form class="form" id="moneyForm" data-type="${type}">${body}<div class="form-actions"><button type="button" class="btn" data-close>Cancel</button><button class="btn primary">Save activity</button></div></form>`,
+  );
+  root
+    .querySelectorAll("[data-close]")
+    .forEach((b) => (b.onclick = () => (root.innerHTML = "")));
+  if (type === "income" || type === "expense") {
+    const person = root.querySelector('[name="person"]');
+    person.onchange = () => syncPersonMoneyFields(type);
+    syncPersonMoneyFields(type);
+  }
+  if (type === "move") {
+    root.querySelector("#moveType").onchange = renderMoveFields;
+    renderMoveFields();
+  }
+  if (type === "adjust")
+    root.querySelector("#targetType").onchange = renderTargetField;
+  root.querySelector("#moneyForm").onsubmit = submitMoney;
+}
+function renderMoveFields() {
+  const t = document.querySelector("#moveType").value;
+  let h = "";
+  if (t !== "envelope-transfer")
+    h +=
+      field(
+        "fromAccount",
+        "From account",
+        `<select name="fromAccount">${options(activeAccounts(), "account")}</select>`,
+      ) +
+      field(
+        "toAccount",
+        "To account",
+        `<select name="toAccount">${options(activeAccounts(), "account")}</select>`,
+      );
+  if (t !== "account-transfer")
+    h +=
+      field(
+        "fromEnvelope",
+        "From envelope",
+        `<select name="fromEnvelope">${options(activeEnvelopes(), "envelope")}</select>`,
+      ) +
+      field(
+        "toEnvelope",
+        "To envelope",
+        `<select name="toEnvelope">${options(activeEnvelopes(), "envelope")}</select>`,
+      );
+  document.querySelector("#moveFields").innerHTML = h;
+}
+function renderTargetField() {
+  const t = document.querySelector("#targetType").value;
+  document.querySelector("#targetField").innerHTML = field(
+    "target",
+    t === "account" ? "Account" : "Envelope",
+    `<select name="target">${options(t === "account" ? activeAccounts() : activeEnvelopes(), t)}</select>`,
+  );
+}
+function submitMoney(e) {
+  e.preventDefault();
+  const f = new FormData(e.currentTarget),
+    type = e.currentTarget.dataset.type,
+    amount = Number(f.get("amount"));
+  if (!(amount > 0)) return toast("Enter an amount greater than zero");
+  const note = f.get("note") || "",
+    date = transactionIso(f.get("date"));
+  let item;
+  if (type === "income" || type === "expense") {
+    const sign = type === "income" ? 1 : -1,
+      a = f.get("account"),
+      v = f.get("envelope"),
+      person = f.get("person"),
+      changes = [
+        { kind: "account", id: a, delta: sign * amount },
+        { kind: "envelope", id: v, delta: sign * amount },
+      ];
+    applyChanges(changes);
+    item = addActivity(
+      {
+        type,
+        amount: sign * amount,
+        person,
+        account: a,
+        envelope: v,
+        title:
+          type === "income"
+            ? `Added to ${account(a).name} + ${envelope(v).name}`
+            : `Spent from ${account(a).name} + ${envelope(v).name}`,
+        note,
+        date,
+      },
+      changes,
+    );
+  }
+  if (type === "move") {
+    const mt = f.get("moveType"),
+      changes = [];
+    let person = "Shared",
+      envId = null,
+      accId = null,
+      title = "Money moved";
+    if (mt !== "envelope-transfer") {
+      const from = f.get("fromAccount"),
+        to = f.get("toAccount");
+      if (from === to) return toast("Choose two different accounts");
+      changes.push(
+        { kind: "account", id: from, delta: -amount },
+        { kind: "account", id: to, delta: amount },
+      );
+      person = account(to).owner;
+      accId = to;
+      title = `${account(from).name}  ->  ${account(to).name}`;
+    }
+    if (mt !== "account-transfer") {
+      const from = f.get("fromEnvelope"),
+        to = f.get("toEnvelope");
+      if (from === to) return toast("Choose two different envelopes");
+      changes.push(
+        { kind: "envelope", id: from, delta: -amount },
+        { kind: "envelope", id: to, delta: amount },
+      );
+      envId = to;
+      person = envelope(to).owner;
+      title =
+        mt === "envelope-transfer"
+          ? `${envelope(from).name}  ->  ${envelope(to).name}`
+          : `${title}  |  ${envelope(from).name}  ->  ${envelope(to).name}`;
+    }
+    applyChanges(changes);
+    item = addActivity(
+      {
+        type: mt,
+        amount,
+        person,
+        account: accId,
+        envelope: envId,
+        title,
+        note,
+        date,
+      },
+      changes,
+    );
+  }
+  if (type === "adjust") {
+    const kind = f.get("targetType"),
+      id = f.get("target"),
+      sign = f.get("direction") === "add" ? 1 : -1,
+      owner = kind === "account" ? account(id).owner : envelope(id).owner,
+      changes = [{ kind, id, delta: sign * amount }];
+    applyChanges(changes);
+    item = addActivity(
+      {
+        type: "adjustment",
+        amount: sign * amount,
+        person: owner,
+        account: kind === "account" ? id : null,
+        envelope: kind === "envelope" ? id : null,
+        title: `Corrected ${kind === "account" ? account(id).name : envelope(id).name}`,
+        note,
+        date,
+      },
+      changes,
+    );
+  }
+  document.querySelector("#modalRoot").innerHTML = "";
+  commitActivity(item);
+}
+function openManager(kind) {
+  const isEnv = kind === "envelope",
+    defs = isEnv ? activeEnvelopes() : activeAccounts(),
+    title = isEnv ? "Manage envelopes" : "Manage physical accounts";
+  const rows = defs
+    .map(
+      (d) =>
+        `<button class="manage-row" data-manage-id="${d.id}" style="--accent:${d.color}"><span class="color-dot"></span><span><b>${esc(d.name)}</b><small>${ownerName(d.owner)}  |  ${money((isEnv ? state.envelopes : state.accounts)[d.id])}${isEnv && state.goals[d.id] ? `  |  Goal ${money(state.goals[d.id])}` : ""}</small></span><i>&rsaquo;</i></button>`,
+    )
+    .join("");
+  const root = modal(
+    title,
+    `<div class="manager-head"><button class="btn primary" id="addManaged">+ Add ${isEnv ? "envelope" : "account"}</button>${!isEnv ? '<button class="btn" id="reconcileManaged">Reconcile</button>' : ""}</div><div class="manage-list">${rows}</div><button class="text-btn" id="showArchived">View archived</button>`,
+  );
+  root.querySelector("#addManaged").onclick = () => editManaged(kind);
+  root
+    .querySelector("#reconcileManaged")
+    ?.addEventListener("click", reconcileAccount);
+  root
+    .querySelectorAll("[data-manage-id]")
+    .forEach((b) => (b.onclick = () => editManaged(kind, b.dataset.manageId)));
+  root.querySelector("#showArchived").onclick = () => showArchived(kind);
+}
+function editManaged(kind, id = null) {
+  const isEnv = kind === "envelope",
+    def = id ? (isEnv ? envelope(id) : account(id)) : null;
+  const body = `<form class="form" id="managedForm">${field("name", isEnv ? "Envelope name" : "Account name", `<input name="name" required maxlength="50" value="${esc(def?.name || "")}">`)}${field(
+    "owner",
+    "Owner",
+    `<select name="owner">${Object.entries(PEOPLE)
+      .map(
+        ([v, l]) =>
+          `<option value="${v}" ${def?.owner === v ? "selected" : ""}>${l}</option>`,
+      )
+      .join("")}</select>`,
+  )}${field("color", "Color", `<input name="color" type="color" value="${def?.color || PALETTE[(isEnv ? state.envelopeDefs.length : state.accountDefs.length) % PALETTE.length]}">`)}${isEnv ? field("goal", "Savings goal", `<input name="goal" type="number" min="0" step="0.01" value="${state.goals[id] || ""}" placeholder="Optional">`) : ""}<div class="form-actions"><button type="button" class="btn" data-close>Cancel</button><button class="btn primary">Save</button></div>${id ? '<button type="button" class="btn danger full" id="archiveManaged">Archive</button>' : ""}</form>`;
+  const root = modal(
+    `${id ? "Edit" : "Add"} ${isEnv ? "envelope" : "account"}`,
+    body,
+  );
+  root
+    .querySelectorAll("[data-close]")
+    .forEach((b) => (b.onclick = () => (root.innerHTML = "")));
+  root.querySelector("#managedForm").onsubmit = (e) => {
+    e.preventDefault();
+    const f = new FormData(e.currentTarget),
+      defs = isEnv ? state.envelopeDefs : state.accountDefs,
+      balances = isEnv ? state.envelopes : state.accounts;
+    if (id) {
+      Object.assign(def, {
+        name: f.get("name").trim(),
+        owner: f.get("owner"),
+        color: f.get("color"),
+      });
+    } else {
+      id = `${isEnv ? "env" : "acct"}-${uid()}`;
+      defs.push({
+        id,
+        name: f.get("name").trim(),
+        owner: f.get("owner"),
+        color: f.get("color"),
+        order: defs.length,
+      });
+      balances[id] = 0;
+    }
+    if (isEnv) {
+      const goal = Number(f.get("goal") || 0);
+      if (goal > 0) state.goals[id] = goal;
+      else delete state.goals[id];
+    }
+    save();
+    root.innerHTML = "";
+    render();
+    toast(`${isEnv ? "Envelope" : "Account"} saved`);
+  };
+  root.querySelector("#archiveManaged")?.addEventListener("click", () => {
+    const bal = Number((isEnv ? state.envelopes : state.accounts)[id] || 0);
+    if (
+      bal !== 0 &&
+      !confirm(`This ${kind} has ${money(bal)}. Archive it anyway?`)
+    )
+      return;
+    (isEnv ? state.archivedEnvelopes : state.archivedAccounts).push(id);
+    save();
+    root.innerHTML = "";
+    render();
+    toast(`${isEnv ? "Envelope" : "Account"} archived`);
+  });
+}
+function showArchived(kind) {
+  const isEnv = kind === "envelope",
+    ids = isEnv ? state.archivedEnvelopes : state.archivedAccounts,
+    defs = isEnv ? state.envelopeDefs : state.accountDefs;
+  modal(
+    `Archived ${isEnv ? "envelopes" : "accounts"}`,
+    ids.length
+      ? `<div class="manage-list">${ids
+          .map((id) => {
+            const d = defs.find((x) => x.id === id);
+            return d
+              ? `<div class="manage-row"><span class="color-dot" style="--accent:${d.color}"></span><span><b>${esc(d.name)}</b><small>${money((isEnv ? state.envelopes : state.accounts)[id])}</small></span><button class="text-btn" data-restore="${id}">Restore</button></div>`
+              : "";
+          })
+          .join("")}</div>`
+      : '<div class="empty">Nothing archived.</div>',
+  );
+  const root = document.querySelector("#modalRoot");
+  root.querySelectorAll("[data-restore]").forEach(
+    (b) =>
+      (b.onclick = () => {
+        const arr = isEnv ? state.archivedEnvelopes : state.archivedAccounts;
+        arr.splice(arr.indexOf(b.dataset.restore), 1);
+        save();
+        openManager(kind);
+        toast("Restored");
+      }),
+  );
+}
+function reconcileAccount() {
+  const root = modal(
+    "Reconcile account",
+    `<form class="form" id="reconcileForm">${field("account", "Physical account", `<select name="account">${options(activeAccounts(), "account")}</select>`)}${field("actual", "Actual balance", '<input name="actual" type="number" step="0.01" required placeholder="0.00">')}${field("envelope", "Apply the difference to", `<select name="envelope">${options(activeEnvelopes(), "envelope", "unsorted")}</select>`)}${dateField()}${noteField("Reason or note")}<div class="form-actions"><button type="button" class="btn" data-close>Cancel</button><button class="btn primary">Reconcile</button></div></form>`,
+  );
+  root
+    .querySelectorAll("[data-close]")
+    .forEach((b) => (b.onclick = () => (root.innerHTML = "")));
+  root.querySelector("#reconcileForm").onsubmit = (e) => {
+    e.preventDefault();
+    const f = new FormData(e.currentTarget),
+      a = f.get("account"),
+      v = f.get("envelope"),
+      actual = Number(f.get("actual")),
+      diff = actual - Number(state.accounts[a] || 0);
+    if (!Number.isFinite(actual)) return;
+    if (diff === 0) return toast("That account already matches");
+    const changes = [
+      { kind: "account", id: a, delta: diff },
+      { kind: "envelope", id: v, delta: diff },
+    ];
+    applyChanges(changes);
+    const item = addActivity(
+      {
+        type: "adjustment",
+        amount: diff,
+        person: account(a).owner,
+        account: a,
+        envelope: v,
+        title: `Reconciled ${account(a).name}`,
+        note: f.get("note") || "",
+        date: transactionIso(f.get("date")),
+      },
+      changes,
+    );
+    root.innerHTML = "";
+    commitActivity(item);
+  };
+}
+function openBreakdown(mode = "account") {
+  const list = mode === "account" ? activeAccounts() : activeEnvelopes(),
+    bucket = mode === "account" ? state.accounts : state.envelopes,
+    positive = list
+      .map((x) => ({ ...x, value: Math.max(0, Number(bucket[x.id] || 0)) }))
+      .filter((x) => x.value > 0),
+    sum = positive.reduce((s, x) => s + x.value, 0),
+    segments = positive.map((x, i) => ({
+      ...x,
+      pct: sum ? (x.value / sum) * 100 : 0,
+      color: x.color || PALETTE[i % PALETTE.length],
+    }));
+  let cursor = 0;
+  const grad = segments.length
+    ? segments
+        .map((x) => {
+          const start = cursor;
+          cursor += x.pct;
+          return `${x.color} ${start}% ${cursor}%`;
+        })
+        .join(",")
+    : "#ded5c8 0 100%";
+  const negatives = list.filter((x) => Number(bucket[x.id] || 0) < 0);
+  const root = modal(
+    "Money breakdown",
+    `<div class="breakdown-tabs"><button data-mode="account" class="${mode === "account" ? "active" : ""}">By account</button><button data-mode="envelope" class="${mode === "envelope" ? "active" : ""}">By envelope</button></div><div class="donut-wrap"><div class="donut" style="background:conic-gradient(${grad})"><div><small>Available</small><b>${money(sum)}</b></div></div><div class="chart-key">${segments.map((x) => `<div><i style="background:${x.color}"></i><span><b>${esc(x.name)}</b><small>${ownerName(x.owner)}</small></span><strong>${money(x.value)}<small>${x.pct.toFixed(1)}%</small></strong></div>`).join("") || "<p>No positive balances yet.</p>"}</div></div>${negatives.length ? `<div class="negative-list"><b>Negative balances</b>${negatives.map((x) => `<div><span>${esc(x.name)}</span><strong>${money(bucket[x.id])}</strong></div>`).join("")}</div>` : ""}`,
+    true,
+  );
+  root
+    .querySelectorAll("[data-mode]")
+    .forEach((b) => (b.onclick = () => openBreakdown(b.dataset.mode)));
+}
+function openEnvelope(id) {
+  const d = envelope(id),
+    bal = Number(state.envelopes[id] || 0),
+    goal = Number(state.goals[id] || 0),
+    pct = goal > 0 ? Math.max(0, Math.min(100, (bal / goal) * 100)) : 0,
+    related = state.activity.filter((x) => x.envelope === id).slice(0, 8);
+  modal(
+    d.name,
+    `<div class="envelope-detail" style="--accent:${d.color}"><div><span class="owner">${ownerName(d.owner)}</span><strong class="big-amount ${bal < 0 ? "negative" : ""}">${money(bal)}</strong></div>${goal > 0 ? `<div class="coffee-goal"><div class="coffee-cup"><div class="coffee-fill" style="height:${pct}%"></div><span>&#9749;</span></div><div><b>${Math.round(pct)}% full</b><small>${money(bal)} of ${money(goal)}</small></div></div>` : ""}<button class="btn" data-edit-envelope>Edit envelope${goal ? " or goal" : ""}</button></div><h3 class="mini-title">Recent activity</h3><div class="activity-list">${activityRows(related)}</div>`,
+  );
+  const root = document.querySelector("#modalRoot");
+  root.querySelector("[data-edit-envelope]").onclick = () =>
+    editManaged("envelope", id);
+  root
+    .querySelectorAll("[data-activity]")
+    .forEach((b) => (b.onclick = () => openActivityDetail(b.dataset.activity)));
+}
+function openActivityDetail(id) {
+  const x = state.activity.find((a) => a.id === id);
+  if (!x) return;
+  const accountNames = [
+      ...new Set(
+        (x.changes || [])
+          .filter((c) => c.kind === "account")
+          .map((c) => account(c.id).name),
+      ),
+    ],
+    envelopeNames = [
+      ...new Set(
+        (x.changes || [])
+          .filter((c) => c.kind === "envelope")
+          .map((c) => envelope(c.id).name),
+      ),
+    ],
+    rows = [
+      ["Amount", money(x.amount)],
+      ["Date", new Date(x.date).toLocaleString()],
+      ["Person", ownerName(x.person)],
+      ["Accounts", accountNames.join(", ") || " - "],
+      ["Envelopes", envelopeNames.join(", ") || " - "],
+      ["Note", x.note || " - "],
+    ];
+  const root = modal(
+    "Activity details",
+    `<dl class="detail-list">${rows.map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>${x.changes?.length ? '<button class="btn danger full" id="reverseActivity">Reverse this transaction</button>' : '<p class="label">Older activity can be corrected from the Money section.</p>'}`,
+  );
+  root.querySelector("#reverseActivity")?.addEventListener("click", () => {
+    if (!confirm("Reverse this transaction and restore the previous balances?"))
+      return;
+    applyChanges(x.changes, -1);
+    state.activity = state.activity.filter((a) => a.id !== id);
+    save();
+    root.innerHTML = "";
+    render();
+    toast("Transaction reversed");
+  });
+}
+let filters = {
+  person: "all",
+  account: "all",
+  envelope: "all",
+  type: "all",
+  from: "",
+  to: "",
+};
+function openFilters() {
+  const root = modal(
+    "Filter activity",
+    `<form class="form" id="filterForm">${field(
+      "person",
+      "Person",
+      `<select name="person"><option value="all">Everyone</option>${Object.entries(
+        PEOPLE,
+      )
+        .map(
+          ([v, l]) =>
+            `<option value="${v}" ${filters.person === v ? "selected" : ""}>${l}</option>`,
+        )
+        .join("")}</select>`,
+    )}${field(
+      "account",
+      "Physical account",
+      `<select name="account"><option value="all">All physical accounts</option>${activeAccounts()
+        .map(
+          (x) =>
+            `<option value="${x.id}" ${filters.account === x.id ? "selected" : ""}>${ownerName(x.owner)} - ${esc(x.name)}</option>`,
+        )
+        .join("")}</select>`,
+    )}${field(
+      "envelope",
+      "Envelope",
+      `<select name="envelope"><option value="all">All envelopes</option>${activeEnvelopes()
+        .map(
+          (x) =>
+            `<option value="${x.id}" ${filters.envelope === x.id ? "selected" : ""}>${esc(x.name)}</option>`,
+        )
+        .join("")}</select>`,
+    )}${field("type", "Activity type", `<select name="type"><option value="all">All activity</option><option value="income">Money added</option><option value="expense">Spending</option><option value="account-transfer">Account moves</option><option value="envelope-transfer">Envelope moves</option><option value="combined-transfer">Combined moves</option><option value="adjustment">Corrections</option></select>`)}<div class="date-filter-grid">${field("from", "From date", `<input name="from" type="date" value="${esc(filters.from)}">`)}${field("to", "Through date", `<input name="to" type="date" value="${esc(filters.to)}">`)}</div><div class="form-actions"><button type="button" class="btn" id="clearFilters">Clear</button><button class="btn primary">Apply</button></div></form>`,
+  );
+  root.querySelector('[name="type"]').value = filters.type;
+  root.querySelector("#clearFilters").onclick = () => {
+    filters = {
+      person: "all",
+      account: "all",
+      envelope: "all",
+      type: "all",
+      from: "",
+      to: "",
+    };
+    root.innerHTML = "";
+    render();
+  };
+  root.querySelector("#filterForm").onsubmit = (e) => {
+    e.preventDefault();
+    const f = new FormData(e.currentTarget);
+    filters = {
+      person: f.get("person"),
+      account: f.get("account"),
+      envelope: f.get("envelope"),
+      type: f.get("type"),
+      from: f.get("from"),
+      to: f.get("to"),
+    };
+    root.innerHTML = "";
+    renderActivityFiltered();
+  };
+}
+function accountAuditSummary(items, id) {
+  const deltas = items.map((x) => ({
+      x,
+      delta: (x.changes || [])
+        .filter((c) => c.kind === "account" && c.id === id)
+        .reduce((sum, c) => sum + Number(c.delta || 0), 0),
+    })),
+    added = deltas
+      .filter((v) => v.x.type === "income")
+      .reduce((s, v) => s + Math.max(0, v.delta), 0),
+    spent = Math.abs(
+      deltas
+        .filter((v) => v.x.type === "expense")
+        .reduce((s, v) => s + Math.min(0, v.delta), 0),
+    ),
+    moved = deltas
+      .filter((v) => String(v.x.type).includes("transfer"))
+      .reduce((s, v) => s + Math.abs(v.delta), 0),
+    corrected = deltas
+      .filter((v) => v.x.type === "adjustment")
+      .reduce((s, v) => s + v.delta, 0);
+  return `<section class="account-audit panel"><div><small>Selected account</small><b>${ownerName(account(id).owner)} - ${esc(account(id).name)}</b><strong>${money(state.accounts[id])}</strong></div><div class="audit-grid"><span><small>Added</small><b>${money(added)}</b></span><span><small>Spent</small><b>${money(spent)}</b></span><span><small>Transferred</small><b>${money(moved)}</b></span><span><small>Corrected</small><b>${money(corrected)}</b></span></div></section>`;
+}
+function renderActivityFiltered() {
+  const from = filters.from ? new Date(`${filters.from}T00:00:00`) : null,
+    to = filters.to ? new Date(`${filters.to}T23:59:59.999`) : null,
+    items = state.activity.filter((x) => {
+      const date = new Date(x.date);
+      return (
+        (filters.person === "all" || x.person === filters.person) &&
+        (filters.account === "all" ||
+          activityTouchesAccount(x, filters.account)) &&
+        (filters.envelope === "all" ||
+          activityTouchesEnvelope(x, filters.envelope)) &&
+        (filters.type === "all" || x.type === filters.type) &&
+        (!from || date >= from) &&
+        (!to || date <= to)
+      );
+    }),
+    running =
+      filters.account === "all"
+        ? null
+        : accountRunningBalances(filters.account);
+  document.querySelector("#activityList").innerHTML = activityRows(
+    items,
+    running,
+  );
+  const activeValues =
+    [filters.person, filters.account, filters.envelope, filters.type].filter(
+      (x) => x !== "all",
+    ).length + [filters.from, filters.to].filter(Boolean).length;
+  const fc = document.querySelector("#filterCount");
+  if (fc) fc.textContent = activeValues ? `(${activeValues})` : "";
+  const af = document.querySelector("#activeFilters");
+  if (af)
+    af.textContent = activeValues ? `${items.length} matching activities` : "";
+  const audit = document.querySelector("#accountAudit");
+  if (audit)
+    audit.innerHTML =
+      filters.account === "all"
+        ? ""
+        : accountAuditSummary(items, filters.account);
+  document
+    .querySelectorAll("[data-activity]")
+    .forEach((b) => (b.onclick = () => openActivityDetail(b.dataset.activity)));
+}
+function summaryBelongs(x, person) {
+  return (
+    person === "all" ||
+    x.person === person ||
+    (x.envelope && envelope(x.envelope).owner === person)
+  );
+}
+function summaryCurrentTotal(person) {
+  return person === "all" ? total(state.envelopes) : profileTotal(person);
+}
+function monthlySummary() {
+  const now = new Date(),
+    monthKeys = [];
+  for (let i = 0; i < 18; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    monthKeys.push(
+      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`,
+    );
+  }
+  state.activity.forEach((x) => {
+    const d = new Date(x.date),
+      key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    if (!monthKeys.includes(key)) monthKeys.push(key);
+  });
+  monthKeys.sort().reverse();
+  const root = modal(
+    "Monthly summary",
+    `<div class="summary-controls"><label>Person<select id="summaryPerson"><option value="all">Everyone</option>${PROFILE_ORDER.map((x) => `<option value="${x}">${ownerName(x)}</option>`).join("")}</select></label><label>Month<select id="summaryMonth">${monthKeys
+      .map((key) => {
+        const [y, m] = key.split("-").map(Number),
+          label = new Date(y, m - 1, 1).toLocaleString(undefined, {
+            month: "long",
+            year: "numeric",
+          });
+        return `<option value="${key}">${label}</option>`;
+      })
+      .join("")}</select></label></div><div id="summaryBody"></div>`,
+  );
+  const draw = () => {
+    const person = root.querySelector("#summaryPerson").value,
+      key = root.querySelector("#summaryMonth").value,
+      [year, month] = key.split("-").map(Number),
+      items = state.activity.filter((x) => {
+        const d = new Date(x.date);
+        return (
+          d.getFullYear() === year &&
+          d.getMonth() === month - 1 &&
+          summaryBelongs(x, person)
+        );
+      }),
+      income = items
+        .filter((x) => x.type === "income")
+        .reduce((sum, x) => sum + Math.max(0, Number(x.amount)), 0),
+      spent = Math.abs(
+        items
+          .filter((x) => x.type === "expense")
+          .reduce((sum, x) => sum + Number(x.amount), 0),
+      ),
+      moved = items
+        .filter((x) => String(x.type).includes("transfer"))
+        .reduce((sum, x) => sum + Math.abs(Number(x.amount)), 0);
+    root.querySelector("#summaryBody").innerHTML =
+      `<p class="summary-month">${person === "all" ? "Everyone" : ownerName(person)}</p><div class="summary-grid"><div><small>Money added</small><b>${money(income)}</b></div><div><small>Money spent</small><b>${money(spent)}</b></div><div><small>Money moved</small><b>${money(moved)}</b></div><div><small>Current envelope total</small><b>${money(summaryCurrentTotal(person))}</b></div></div>`;
+  };
+  root.querySelector("#summaryPerson").onchange = draw;
+  root.querySelector("#summaryMonth").onchange = draw;
+  draw();
+}
+let splitParts = [];
+function loadPreset(id) {
+  const p = state.presets.find((x) => x.id === id);
+  splitParts = clone(p?.parts || [{ envelope: "a-business", percent: 100 }]);
+  renderSplitEditor();
+}
+function renderSplitEditor() {
+  const host = document.querySelector("#splitEditor");
+  if (!host) return;
+  const n = Number(document.querySelector("#calcAmount")?.value || 0),
+    sum = splitParts.reduce((s, x) => s + Number(x.percent || 0), 0);
+  host.innerHTML = `<div class="split-rows">${splitParts.map((p, i) => `<div class="split-edit"><select data-split-env="${i}">${options(activeEnvelopes(), "envelope", p.envelope)}</select><label><input data-split-pct="${i}" type="number" min="0" max="100" step="1" value="${p.percent}"><span>%</span></label><strong>${money((n * p.percent) / 100)}</strong><button data-remove-split="${i}" aria-label="Remove">&times;</button></div>`).join("")}</div><div class="split-total ${Math.abs(sum - 100) > 0.001 ? "bad" : ""}"><span>${sum === 100 ? "Ready" : "Remaining"} </span><b>${sum === 100 ? "100%" : `${100 - sum}%`}</b><strong>${money(n)}</strong></div>`;
+  host.querySelectorAll("[data-split-env]").forEach(
+    (s) =>
+      (s.onchange = () => {
+        splitParts[Number(s.dataset.splitEnv)].envelope = s.value;
+        renderSplitEditor();
+      }),
+  );
+  host.querySelectorAll("[data-split-pct]").forEach(
+    (inp) =>
+      (inp.oninput = () => {
+        splitParts[Number(inp.dataset.splitPct)].percent = Number(
+          inp.value || 0,
+        );
+        renderSplitEditor();
+      }),
+  );
+  host.querySelectorAll("[data-remove-split]").forEach(
+    (b) =>
+      (b.onclick = () => {
+        splitParts.splice(Number(b.dataset.removeSplit), 1);
+        renderSplitEditor();
+      }),
+  );
+}
+function savePreset() {
+  const sum = splitParts.reduce((s, x) => s + x.percent, 0);
+  if (Math.abs(sum - 100) > 0.001) return toast("Split must total 100%");
+  const current = document.querySelector("#presetSelect").value,
+    name = prompt(
+      "Preset name",
+      current === "custom"
+        ? "My split"
+        : state.presets.find((x) => x.id === current)?.name || "My split",
+    );
+  if (!name) return;
+  const existing = state.presets.find((x) => x.id === current);
+  if (existing) {
+    existing.name = name;
+    existing.parts = clone(splitParts);
+  } else
+    state.presets.push({
+      id: `preset-${uid()}`,
+      name,
+      parts: clone(splitParts),
+    });
+  save();
+  render();
+  toast("Preset saved");
+}
+function copySplit() {
+  const n = Number(document.querySelector("#calcAmount").value),
+    sum = splitParts.reduce((s, x) => s + x.percent, 0);
+  if (!(n > 0)) return toast("Enter an amount first");
+  if (Math.abs(sum - 100) > 0.001) return toast("Split must total 100%");
+  const text =
+    `2 Broke Girls split for ${money(n)}\n` +
+    splitParts
+      .map(
+        (p) =>
+          `${envelope(p.envelope).name} ${p.percent}%: ${money((n * p.percent) / 100)}`,
+      )
+      .join("\n");
+  navigator.clipboard
+    ?.writeText(text)
+    .then(() => toast("Breakdown copied"))
+    .catch(() => toast("Copy is not available"));
+}
+function settings() {
+  const status =
+    document.querySelector("#syncBadge")?.textContent || cloudStatus.text;
+  const root = modal(
+    "Settings",
+    `<div class="status-card"><span class="status-dot ${cloudStatus.tone}"></span><div><b>${esc(status)}</b><small>Cloud status</small></div><button class="text-btn" id="retrySync">Retry</button></div><div class="settings-list"><button id="manageUsers">Manage users <span>&rsaquo;</span></button><button id="exportBtn">Download backup <span>&rsaquo;</span></button><label>Restore backup <span>&rsaquo;</span><input type="file" id="importFile" accept="application/json" hidden></label><button id="archivedBtn">Archived envelopes <span>&rsaquo;</span></button><button id="appInfo">App information <span>&rsaquo;</span></button><button id="signOut">Sign out <span>&rsaquo;</span></button></div>`,
+  );
+  root.querySelector("#retrySync").onclick = () => window.Cloud?.start?.();
+  root.querySelector("#manageUsers").onclick = () =>
+    modal(
+      "Manage users",
+      '<p>Amanda and Katie use their approved Google accounts. New users must be added to both the app access list and Firebase security rules.</p><p class="label">Katie&rsquo;s access test is still pending.</p>',
+    );
+  root.querySelector("#exportBtn").onclick = exportData;
+  root.querySelector("#importFile").onchange = importData;
+  root.querySelector("#archivedBtn").onclick = () => showArchived("envelope");
+  root.querySelector("#appInfo").onclick = () =>
+    modal(
+      "App information",
+      "<p><b>2 Broke Girls</b></p><p>Version 5.1 | fresh-start balances</p>",
+    );
+  root.querySelector("#signOut").onclick = () => window.Cloud?.signOut?.();
+}
+function exportData() {
+  const blob = new Blob([JSON.stringify(state, null, 2)], {
+      type: "application/json",
+    }),
+    a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `2-broke-girls-backup-${new Date().toISOString().slice(0, 10)}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+function importData(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try {
+      const d = JSON.parse(r.result);
+      if (!d.accounts || !d.envelopes || !Array.isArray(d.activity)) throw 0;
+      state = normalize(d);
+      save();
+      document.querySelector("#modalRoot").innerHTML = "";
+      render();
+      toast("Backup restored");
+    } catch {
+      toast("That backup file is not valid");
+    }
+  };
+  r.readAsText(file);
+}
+function bind() {
+  document.querySelectorAll("[data-view]").forEach(
+    (b) =>
+      (b.onclick = () => {
+        state.view = b.dataset.view;
+        save(false);
+        render();
+      }),
+  );
+  document
+    .querySelectorAll("[data-open]")
+    .forEach((b) => (b.onclick = () => openModal(b.dataset.open)));
+  document
+    .querySelectorAll("[data-settings]")
+    .forEach((b) => (b.onclick = settings));
+  document.querySelector("#menuBtn").onclick = settings;
+  document
+    .querySelectorAll("[data-profile]")
+    .forEach(
+      (b) =>
+        (b.onclick = () =>
+          b.dataset.profile === "Kids"
+            ? openKids()
+            : openProfile(b.dataset.profile)),
+    );
+  document.querySelector("#chartPerson")?.addEventListener("change", (e) => {
+    homeChartPerson = e.target.value;
+    render();
+  });
+  document.querySelectorAll("[data-home-mode]").forEach(
+    (b) =>
+      (b.onclick = () => {
+        homeChartMode = b.dataset.homeMode;
+        render();
+      }),
+  );
+  document
+    .querySelectorAll("[data-envelope]")
+    .forEach((b) => (b.onclick = () => openEnvelope(b.dataset.envelope)));
+  document
+    .querySelector("[data-summary]")
+    ?.addEventListener("click", monthlySummary);
+  document
+    .querySelector("[data-filters]")
+    ?.addEventListener("click", openFilters);
+  document
+    .querySelectorAll("[data-activity]")
+    .forEach((b) => (b.onclick = () => openActivityDetail(b.dataset.activity)));
+  const amount = document.querySelector("#calcAmount"),
+    preset = document.querySelector("#presetSelect");
+  if (amount && preset) {
+    preset.onchange = () => loadPreset(preset.value);
+    amount.oninput = renderSplitEditor;
+    document.querySelector("#addSplitRow").onclick = () => {
+      splitParts.push({
+        envelope: activeEnvelopes()[0]?.id || "a-business",
+        percent: 0,
+      });
+      renderSplitEditor();
+    };
+    document.querySelector("#savePreset").onclick = savePreset;
+    document.querySelector("#resetCalc").onclick = () => {
+      amount.value = "";
+      loadPreset(preset.value);
+    };
+    document.querySelector("#copyCalc").onclick = copySplit;
+    loadPreset(preset.value);
+  }
+  if (state.view === "activity") renderActivityFiltered();
+}
+window.getCloudState = () => state;
+window.receiveCloudState = (data) => {
+  try {
+    if (!data || typeof data !== "object" || Array.isArray(data))
+      throw new Error("Shared data format is not valid");
+    const currentView = state.view,
+      needsFreshReset = !data?.migrations?.freshStartV51;
+    state = normalize({ ...data, view: currentView });
+    localStorage.setItem(KEY, JSON.stringify(state));
+    render();
+    if (needsFreshReset) setTimeout(() => window.Cloud?.write(state), 0);
+  } catch (error) {
+    console.error("Cloud state failed", error);
+    cloudStatus = { text: "Data recovery needed", tone: "warn" };
+    recoveryView(error);
+  }
+};
+window.onCloudStatus = (text, tone) => {
+  cloudStatus = { text, tone };
+  const b = document.querySelector("#syncBadge");
+  if (b) {
+    b.textContent = text;
+    b.dataset.tone = tone || "";
+  }
+  if (state.view === "home") render();
+};
+if ("serviceWorker" in navigator && location.protocol.startsWith("http"))
+  window.addEventListener("load", () =>
+    navigator.serviceWorker
+      .register("./service-worker.js", { updateViaCache: "none" })
+      .then((reg) => reg.update())
+      .catch((error) => console.warn("Service worker update failed", error)),
+  );
+window.repairLocalApp = repairLocalApp;
 render();
-if(location.protocol!=='file:'&&!new URLSearchParams(location.search).has('preview'))window.Cloud?.start();
+if (
+  location.protocol !== "file:" &&
+  !new URLSearchParams(location.search).has("preview")
+)
+  window.Cloud?.start();
